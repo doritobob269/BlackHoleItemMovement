@@ -1,0 +1,35 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.40'
+    id 'java'
+}
+
+group = 'com.doritobob'
+version = '1.0.0'
+archivesBaseName = 'blackhole'
+
+sourceCompatibility = '17'
+targetCompatibility = '17'
+
+repositories {
+    maven { url = 'https://maven.minecraftforge.net' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.1.0'
+}
+
+// This is a minimal build.gradle to scaffold the project. Replace the Forge version above
+// with a valid build from the Forge maven (check https://maven.minecraftforge.net/).
+
+jar {
+    manifest {
+        attributes(
+            'Specification-Title': project.name,
+            'Specification-Vendor': 'Doritobob',
+            'Specification-Version': project.version,
+            'Implementation-Title': project.name,
+            'Implementation-Version': project.version
+        )
+    }
+}
