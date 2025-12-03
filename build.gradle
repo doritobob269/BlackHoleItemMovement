@@ -5,31 +5,41 @@ plugins {
 
 group = 'com.doritobob'
 version = '1.0.0'
-archivesBaseName = 'blackhole'
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    runs {
+        client {
+            workingDirectory project.file('run')
+            mods {
+                blackhole {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run')
+            args '--nogui'
+            mods {
+                blackhole {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
 
 repositories {
-    maven { url = 'https://maven.minecraftforge.net' }
+    maven { url = 'https://files.minecraftforge.net/' }
     mavenCentral()
 }
 
 dependencies {
     minecraft 'net.minecraftforge:forge:1.20.1-47.1.0'
-}
-
-// This is a minimal build.gradle to scaffold the project. Replace the Forge version above
-// with a valid build from the Forge maven (check https://maven.minecraftforge.net/).
-
-jar {
-    manifest {
-        attributes(
-            'Specification-Title': project.name,
-            'Specification-Vendor': 'Doritobob',
-            'Specification-Version': project.version,
-            'Implementation-Title': project.name,
-            'Implementation-Version': project.version
-        )
-    }
 }
