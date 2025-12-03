@@ -1,4 +1,4 @@
-package com.example.blackholditemmovement;
+package io.github.doritobob269.blackholditemmovement;
 
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
