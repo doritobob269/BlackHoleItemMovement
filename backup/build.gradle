@@ -1,0 +1,45 @@
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.40'
+    id 'java'
+}
+
+group = 'com.doritobob'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+minecraft {
+    mappings channel: 'official', version: '1.20.1'
+    runs {
+        client {
+            workingDirectory project.file('run')
+            mods {
+                blackhole {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run')
+            args '--nogui'
+            mods {
+                blackhole {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    maven { url = 'https://files.minecraftforge.net/' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft 'net.minecraftforge:forge:1.20.1-47.1.0'
+}

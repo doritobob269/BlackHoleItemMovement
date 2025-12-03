@@ -1,0 +1,12 @@
+modLoader="javafml"
+loaderVersion=">=47"
+
+[[mods]]
+modId="blackhole"
+version="1.0.0"
+displayName="Black Hole"
+description='''
+A simple black hole mod: place receiver blocks at home and bind portable black hole items
+to that receiver. Place bound black holes on chests to suck items into the receiver.
+'''
+authors="Doritobob"
