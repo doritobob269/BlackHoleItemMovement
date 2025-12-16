@@ -47,12 +47,25 @@ public class BlackHoleBlock extends Block implements EntityBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction face = context.getClickedFace();
-        return this.defaultBlockState().setValue(FACING, face).setValue(ATTACHED, true);
+        // Regular placement (chest blocks) should have ATTACHED=false
+        // Portable black holes set ATTACHED=true when placed
+        return this.defaultBlockState().setValue(FACING, face).setValue(ATTACHED, false);
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, ATTACHED);
+    }
+
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide && placer instanceof Player) {
+            BlockEntity be = level.getBlockEntity(pos);
+            if (be instanceof BlackHoleBlockEntity) {
+                ((BlackHoleBlockEntity) be).setOwner(placer.getUUID());
+            }
+        }
     }
 
     @Override
@@ -62,22 +75,28 @@ public class BlackHoleBlock extends Block implements EntityBlock {
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && !state.getValue(ATTACHED)) {
+        if (!level.isClientSide) {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BlackHoleBlockEntity) {
-                NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
-                    @Override
-                    public Component getDisplayName() {
-                        return Component.literal("Black Hole Chest");
-                    }
+                BlackHoleBlockEntity bhbe = (BlackHoleBlockEntity) be;
+                // Only open GUI if not attached to a container (portable black holes have ATTACHED=true and targetPos)
+                boolean isPortableBlackHole = state.getValue(ATTACHED) && bhbe.getTarget() != null;
+                if (!isPortableBlackHole) {
+                    // This is a Black Hole Chest, open GUI
+                    NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
+                        @Override
+                        public Component getDisplayName() {
+                            return Component.literal("Black Hole Chest");
+                        }
 
-                    @Override
-                    public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player player) {
-                        return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, playerInv, be);
-                    }
-                }, pos);
+                        @Override
+                        public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player player) {
+                            return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, playerInv, be);
+                        }
+                    }, pos);
+                    return InteractionResult.SUCCESS;
+                }
             }
-            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }

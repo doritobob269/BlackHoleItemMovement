@@ -40,11 +40,12 @@ public class BlackHoleItem extends Item {
             level.playSound(null, placePos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0f, 1.0f);
 
             ItemStack stack = ctx.getItemInHand();
-            if (stack.hasTag() && stack.getTag().contains("TargetPos")) {
-                long longPos = stack.getTag().getLong("TargetPos");
-                BlockPos target = BlockPos.of(longPos);
-                BlockEntity be = level.getBlockEntity(placePos);
-                if (be instanceof BlackHoleBlockEntity) {
+            BlockEntity be = level.getBlockEntity(placePos);
+            if (be instanceof BlackHoleBlockEntity && player != null) {
+                ((BlackHoleBlockEntity) be).setOwner(player.getUUID());
+                if (stack.hasTag() && stack.getTag().contains("TargetPos")) {
+                    long longPos = stack.getTag().getLong("TargetPos");
+                    BlockPos target = BlockPos.of(longPos);
                     ((BlackHoleBlockEntity) be).setTarget(target);
                 }
             }

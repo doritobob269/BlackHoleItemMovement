@@ -22,11 +22,10 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class BlackHoleBlockEntity extends BlockEntity {
-    private final ItemStackHandler inventory = new ItemStackHandler(27);
-    private final LazyOptional<IItemHandler> inventoryCap = LazyOptional.of(() -> inventory);
-
     @Nullable
     private BlockPos targetPos;
+    @Nullable
+    private java.util.UUID ownerUUID;
 
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
         super(ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get(), pos, state);
@@ -35,30 +34,23 @@ public class BlackHoleBlockEntity extends BlockEntity {
     @Override
     public void load(CompoundTag tag) {
         super.load(tag);
-        if (tag.contains("Inventory")) {
-            inventory.deserializeNBT(tag.getCompound("Inventory"));
-        }
         if (tag.contains("TargetPos")) {
             this.targetPos = BlockPos.of(tag.getLong("TargetPos"));
+        }
+        if (tag.contains("OwnerUUID")) {
+            this.ownerUUID = tag.getUUID("OwnerUUID");
         }
     }
 
     @Override
     protected void saveAdditional(CompoundTag tag) {
         super.saveAdditional(tag);
-        tag.put("Inventory", inventory.serializeNBT());
         if (this.targetPos != null) {
             tag.putLong("TargetPos", this.targetPos.asLong());
         }
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return inventoryCap.cast();
+        if (this.ownerUUID != null) {
+            tag.putUUID("OwnerUUID", this.ownerUUID);
         }
-        return super.getCapability(cap, side);
     }
 
     public void setTarget(BlockPos pos) {
@@ -71,8 +63,14 @@ public class BlackHoleBlockEntity extends BlockEntity {
         return targetPos;
     }
 
-    public ItemStackHandler getInventory() {
-        return inventory;
+    public void setOwner(java.util.UUID uuid) {
+        this.ownerUUID = uuid;
+        setChanged();
+    }
+
+    @Nullable
+    public java.util.UUID getOwnerUUID() {
+        return ownerUUID;
     }
 
     private static ItemStack insertToHandler(IItemHandler dest, ItemStack stack) {
@@ -117,54 +115,43 @@ public class BlackHoleBlockEntity extends BlockEntity {
                     }
                 }
 
+                // Get owner's global inventory
+                java.util.UUID ownerUUID = blackHole.getOwnerUUID();
+                IItemHandler globalInventory = null;
+                if (ownerUUID != null && level.getServer() != null) {
+                    net.minecraft.server.level.ServerPlayer player = level.getServer().getPlayerList().getPlayer(ownerUUID);
+                    if (player != null) {
+                        globalInventory = player.getCapability(io.github.doritobob269.blackholeitemmovement.capability.BlackHoleCapabilities.PLAYER_BLACK_HOLE_INVENTORY)
+                            .map(inv -> inv.getInventory()).orElse(null);
+                    }
+                }
+
+                // Try to pull items from source slots
                 boolean extractedAny = false;
                 for (int i = 0; i < source.getSlots(); i++) {
                     ItemStack avail = source.extractItem(i, 64, true);
                     if (avail.isEmpty()) continue;
 
                     ItemStack remainder = avail;
-                    if (receiver != null) {
-                        remainder = insertToHandler(receiver, avail.copy());
+                    if (globalInventory != null) {
+                        remainder = insertToHandler(globalInventory, avail.copy());
                     }
 
                     int inserted = avail.getCount() - remainder.getCount();
                     if (inserted > 0) {
                         source.extractItem(i, inserted, false);
                         extractedAny = true;
-                    } else {
-                        ItemStack toStore = avail.copy();
-                        ItemStack rem2 = insertToHandler(blackHole.inventory, toStore);
-                        int stored = toStore.getCount() - rem2.getCount();
-                        if (stored > 0) {
-                            source.extractItem(i, stored, false);
-                            extractedAny = true;
-                        }
                     }
                 }
 
-                if (blackHole.inventory.getSlots() > 0 && blackHole.targetPos != null && receiver != null) {
-                    for (int i = 0; i < blackHole.inventory.getSlots(); i++) {
-                        ItemStack stack = blackHole.inventory.getStackInSlot(i);
-                        if (stack.isEmpty()) continue;
-                        ItemStack rem = insertToHandler(receiver, stack.copy());
-                        int moved = stack.getCount() - rem.getCount();
-                        if (moved > 0) {
-                            blackHole.inventory.extractItem(i, moved, false);
-                            extractedAny = true;
-                        }
-                    }
-                }
-
+                // Check if source has any extractable items left
                 boolean sourceEmpty = true;
                 for (int i = 0; i < source.getSlots(); i++) {
                     ItemStack check = source.extractItem(i, 1, true);
                     if (!check.isEmpty()) { sourceEmpty = false; break; }
                 }
 
-                boolean bufferEmpty = true;
-                for (int i = 0; i < blackHole.inventory.getSlots(); i++) if (!blackHole.inventory.getStackInSlot(i).isEmpty()) { bufferEmpty = false; break; }
-
-                if (sourceEmpty && bufferEmpty) {
+                if (sourceEmpty) {
                     level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
                 } else if (extractedAny) {
                     blackHole.setChanged();
