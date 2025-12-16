@@ -27,8 +27,34 @@ public class BlackHoleBlockEntity extends BlockEntity {
     @Nullable
     private java.util.UUID ownerUUID;
 
+    // Chest animation fields
+    private int openCount;
+    private float openness;
+    private float oOpenness;
+
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
         super(ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    public void startOpen() {
+        this.openCount++;
+    }
+
+    public void stopOpen() {
+        this.openCount--;
+    }
+
+    public float getOpenNess(float partialTicks) {
+        return net.minecraft.util.Mth.lerp(partialTicks, this.oOpenness, this.openness);
+    }
+
+    public void updateOpenness() {
+        this.oOpenness = this.openness;
+        if (this.openCount > 0) {
+            this.openness = Math.min(1.0f, this.openness + 0.1f);
+        } else {
+            this.openness = Math.max(0.0f, this.openness - 0.1f);
+        }
     }
 
     @Override
@@ -85,9 +111,13 @@ public class BlackHoleBlockEntity extends BlockEntity {
     public static <T extends BlockEntity> BlockEntityTicker<T> createTicker(BlockEntityType<T> type) {
         return (level, pos, state, be) -> {
             if (!(be instanceof BlackHoleBlockEntity)) return;
-            if (level.isClientSide) return;
 
             BlackHoleBlockEntity blackHole = (BlackHoleBlockEntity) be;
+
+            // Update chest animation on both client and server
+            blackHole.updateOpenness();
+
+            if (level.isClientSide) return;
             BlockState bs = state;
             boolean attached = bs.hasProperty(BlackHoleBlock.ATTACHED) && bs.getValue(BlackHoleBlock.ATTACHED);
             Direction facing = bs.hasProperty(BlackHoleBlock.FACING) ? bs.getValue(BlackHoleBlock.FACING) : Direction.NORTH;

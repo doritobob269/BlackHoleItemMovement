@@ -5,6 +5,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -27,6 +29,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.block.RenderShape;
 import javax.annotation.Nullable;
 
 public class BlackHoleBlock extends Block implements EntityBlock {
@@ -107,6 +110,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                 boolean isPortableBlackHole = state.getValue(ATTACHED) && bhbe.getTarget() != null;
                 if (!isPortableBlackHole) {
                     // This is a Black Hole Chest, open GUI
+                    level.playSound(null, pos, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.1f + 0.9f);
                     NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
                         @Override
                         public Component getDisplayName() {
@@ -125,10 +129,21 @@ public class BlackHoleBlock extends Block implements EntityBlock {
         return InteractionResult.PASS;
     }
 
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        // Use MODEL for chest blocks (not attached) so they can use BlockEntityRenderer
+        // Use ENTITYBLOCK_ANIMATED for chest animation
+        if (!state.getValue(ATTACHED)) {
+            return RenderShape.ENTITYBLOCK_ANIMATED;
+        }
+        // Use MODEL for portable black holes (they use static JSON models)
+        return RenderShape.MODEL;
+    }
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide) return null;
+        // Need ticker on both client and server - client for animation, server for extraction
         if (type == io.github.doritobob269.blackholeitemmovement.registry.ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get()) {
             return (BlockEntityTicker<T>) io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity.createTicker((BlockEntityType<T>) type);
         }

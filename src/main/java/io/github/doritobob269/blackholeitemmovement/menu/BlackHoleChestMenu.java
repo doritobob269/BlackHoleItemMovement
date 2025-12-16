@@ -2,6 +2,8 @@ package io.github.doritobob269.blackholeitemmovement.menu;
 
 import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
 import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -17,6 +19,11 @@ public class BlackHoleChestMenu extends AbstractContainerMenu {
     public BlackHoleChestMenu(int windowId, Inventory playerInv, BlockEntity be) {
         super(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), windowId);
         this.blockEntity = (BlackHoleBlockEntity) be;
+
+        // Notify block entity that chest is being opened
+        if (this.blockEntity != null) {
+            this.blockEntity.startOpen();
+        }
 
         // Get player's global black hole inventory
         this.globalInventory = playerInv.player.getCapability(io.github.doritobob269.blackholeitemmovement.capability.BlackHoleCapabilities.PLAYER_BLACK_HOLE_INVENTORY)
@@ -75,5 +82,15 @@ public class BlackHoleChestMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return blockEntity != null && !blockEntity.isRemoved() && player.distanceToSqr(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY() + 0.5, blockEntity.getBlockPos().getZ() + 0.5) <= 64.0;
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        if (blockEntity != null && !blockEntity.isRemoved()) {
+            // Notify block entity that chest is being closed
+            blockEntity.stopOpen();
+            player.level().playSound(null, blockEntity.getBlockPos(), SoundEvents.CHEST_CLOSE, SoundSource.BLOCKS, 0.5f, player.level().random.nextFloat() * 0.1f + 0.9f);
+        }
     }
 }
