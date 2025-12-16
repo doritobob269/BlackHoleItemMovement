@@ -33,7 +33,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty ATTACHED = BooleanProperty.create("attached");
 
-    // Full chest shape (for ATTACHED=false)
+    // Full chest shape matching vanilla chest (for ATTACHED=false)
     private static final VoxelShape SHAPE_CHEST = Block.box(1, 0, 1, 15, 14, 15);
 
     // Thin shapes for each direction (for ATTACHED=true portable black holes)
