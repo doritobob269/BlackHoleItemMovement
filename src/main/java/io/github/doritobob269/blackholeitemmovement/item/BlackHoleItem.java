@@ -33,6 +33,24 @@ public class BlackHoleItem extends Item {
             return InteractionResult.SUCCESS;
         }
 
+        // Check if the clicked block has an inventory
+        BlockEntity clickedBE = level.getBlockEntity(clicked);
+        if (clickedBE == null) {
+            return InteractionResult.FAIL;
+        }
+
+        boolean hasInventory = clickedBE.getCapability(net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER, ctx.getClickedFace()).isPresent();
+        if (!hasInventory) {
+            hasInventory = clickedBE.getCapability(net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER, null).isPresent();
+        }
+
+        if (!hasInventory) {
+            if (!level.isClientSide && player != null) {
+                player.displayClientMessage(Component.literal("This block has no inventory!"), true);
+            }
+            return InteractionResult.FAIL;
+        }
+
         if (!level.isClientSide) {
             BlockPos placePos = ctx.getClickedPos().relative(ctx.getClickedFace());
             BlockState state = ModRegistry.BLACK_HOLE_BLOCK.get().defaultBlockState().setValue(BlockStateProperties.FACING, ctx.getClickedFace()).setValue(BlockStateProperties.ATTACHED, true);

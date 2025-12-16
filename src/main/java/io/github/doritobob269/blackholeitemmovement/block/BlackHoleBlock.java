@@ -32,7 +32,14 @@ import javax.annotation.Nullable;
 public class BlackHoleBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty ATTACHED = BooleanProperty.create("attached");
-    private static final VoxelShape SHAPE = Block.box(0,0,0,16,2,16);
+
+    // Thin shapes for each direction (0.1 pixel thick)
+    private static final VoxelShape SHAPE_DOWN = Block.box(0, 14, 0, 16, 16, 16);
+    private static final VoxelShape SHAPE_UP = Block.box(0, 0, 0, 16, 2, 16);
+    private static final VoxelShape SHAPE_NORTH = Block.box(0, 0, 14, 16, 16, 16);
+    private static final VoxelShape SHAPE_SOUTH = Block.box(0, 0, 0, 16, 16, 2);
+    private static final VoxelShape SHAPE_WEST = Block.box(14, 0, 0, 16, 16, 16);
+    private static final VoxelShape SHAPE_EAST = Block.box(0, 0, 0, 2, 16, 16);
 
     public BlackHoleBlock(Properties properties) {
         super(properties);
@@ -70,7 +77,15 @@ public class BlackHoleBlock extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
-        return SHAPE;
+        Direction facing = state.getValue(FACING);
+        return switch (facing) {
+            case DOWN -> SHAPE_DOWN;
+            case UP -> SHAPE_UP;
+            case NORTH -> SHAPE_NORTH;
+            case SOUTH -> SHAPE_SOUTH;
+            case WEST -> SHAPE_WEST;
+            case EAST -> SHAPE_EAST;
+        };
     }
 
     @Override

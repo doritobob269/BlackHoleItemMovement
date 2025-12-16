@@ -1,5 +1,16 @@
 {
   "variants": {
-    "": { "model": "blackholeitemmovement:block/black_hole" }
+    "attached=false,facing=down": { "model": "blackholeitemmovement:block/black_hole", "x": 180 },
+    "attached=false,facing=up": { "model": "blackholeitemmovement:block/black_hole" },
+    "attached=false,facing=north": { "model": "blackholeitemmovement:block/black_hole", "x": 270 },
+    "attached=false,facing=south": { "model": "blackholeitemmovement:block/black_hole", "x": 90 },
+    "attached=false,facing=west": { "model": "blackholeitemmovement:block/black_hole", "x": 90, "y": 270 },
+    "attached=false,facing=east": { "model": "blackholeitemmovement:block/black_hole", "x": 90, "y": 90 },
+    "attached=true,facing=down": { "model": "blackholeitemmovement:block/black_hole", "x": 180 },
+    "attached=true,facing=up": { "model": "blackholeitemmovement:block/black_hole" },
+    "attached=true,facing=north": { "model": "blackholeitemmovement:block/black_hole", "x": 270 },
+    "attached=true,facing=south": { "model": "blackholeitemmovement:block/black_hole", "x": 90 },
+    "attached=true,facing=west": { "model": "blackholeitemmovement:block/black_hole", "x": 90, "y": 270 },
+    "attached=true,facing=east": { "model": "blackholeitemmovement:block/black_hole", "x": 90, "y": 90 }
   }
 }
