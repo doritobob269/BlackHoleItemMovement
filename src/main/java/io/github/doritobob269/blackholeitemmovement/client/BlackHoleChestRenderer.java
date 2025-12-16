@@ -86,18 +86,18 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         float z1 = 1f / 16f;
         float z2 = 15f / 16f;
 
-        // Front face
-        addQuad(vertexConsumer, poseStack, x1, y1, z1, x2, y2, z1, combinedLight, combinedOverlay);
-        // Back face
-        addQuad(vertexConsumer, poseStack, x2, y1, z2, x1, y2, z2, combinedLight, combinedOverlay);
-        // Left face
-        addQuad(vertexConsumer, poseStack, x1, y1, z2, x1, y2, z1, combinedLight, combinedOverlay);
-        // Right face
-        addQuad(vertexConsumer, poseStack, x2, y1, z1, x2, y2, z2, combinedLight, combinedOverlay);
-        // Top face
-        addQuadHorizontal(vertexConsumer, poseStack, x1, y2, z1, x2, z2, combinedLight, combinedOverlay);
-        // Bottom face
-        addQuadHorizontal(vertexConsumer, poseStack, x1, y1, z2, x2, z1, combinedLight, combinedOverlay);
+        // Front face (Z-)
+        addVerticalQuad(vertexConsumer, poseStack, x1, y1, z1, x2, y2, z1, 0, 0, -1, combinedLight, combinedOverlay);
+        // Back face (Z+)
+        addVerticalQuad(vertexConsumer, poseStack, x2, y1, z2, x1, y2, z2, 0, 0, 1, combinedLight, combinedOverlay);
+        // Left face (X-)
+        addVerticalQuad(vertexConsumer, poseStack, x1, y1, z2, x1, y2, z1, -1, 0, 0, combinedLight, combinedOverlay);
+        // Right face (X+)
+        addVerticalQuad(vertexConsumer, poseStack, x2, y1, z1, x2, y2, z2, 1, 0, 0, combinedLight, combinedOverlay);
+        // Top face (Y+)
+        addHorizontalQuad(vertexConsumer, poseStack, x1, y2, z1, x2, z2, 0, 1, 0, combinedLight, combinedOverlay);
+        // Bottom face (Y-)
+        addHorizontalQuad(vertexConsumer, poseStack, x1, y1, z2, x2, z1, 0, -1, 0, combinedLight, combinedOverlay);
     }
 
     private void renderChestLid(PoseStack poseStack, MultiBufferSource bufferSource,
@@ -112,11 +112,11 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         float z1 = 1f / 16f;
         float z2 = 15f / 16f;
 
-        // Translate to hinge position (back of lid)
+        // Translate to hinge position (back of lid at z2)
         poseStack.translate(0.5, y1, z2);
 
-        // Rotate lid around X axis (opens backwards)
-        poseStack.mulPose(Axis.XP.rotationDegrees(-(lidAngle * 90f)));
+        // Rotate lid around X axis (opens away from player, outward)
+        poseStack.mulPose(Axis.XP.rotationDegrees(lidAngle * 90f));
 
         // Translate back
         poseStack.translate(-0.5, -y1, -z2);
@@ -124,16 +124,16 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         VertexConsumer vertexConsumer = CHEST_MATERIAL.buffer(bufferSource, RenderType::entityCutout);
 
         // Render the lid
-        // Front face
-        addQuad(vertexConsumer, poseStack, x1, y1, z1, x2, y2, z1, combinedLight, combinedOverlay);
-        // Back face
-        addQuad(vertexConsumer, poseStack, x2, y1, z2, x1, y2, z2, combinedLight, combinedOverlay);
-        // Left face
-        addQuad(vertexConsumer, poseStack, x1, y1, z2, x1, y2, z1, combinedLight, combinedOverlay);
-        // Right face
-        addQuad(vertexConsumer, poseStack, x2, y1, z1, x2, y2, z2, combinedLight, combinedOverlay);
-        // Top face
-        addQuadHorizontal(vertexConsumer, poseStack, x1, y2, z1, x2, z2, combinedLight, combinedOverlay);
+        // Front face (Z-)
+        addVerticalQuad(vertexConsumer, poseStack, x1, y1, z1, x2, y2, z1, 0, 0, -1, combinedLight, combinedOverlay);
+        // Back face (Z+) - this is the hinge side
+        addVerticalQuad(vertexConsumer, poseStack, x2, y1, z2, x1, y2, z2, 0, 0, 1, combinedLight, combinedOverlay);
+        // Left face (X-)
+        addVerticalQuad(vertexConsumer, poseStack, x1, y1, z2, x1, y2, z1, -1, 0, 0, combinedLight, combinedOverlay);
+        // Right face (X+)
+        addVerticalQuad(vertexConsumer, poseStack, x2, y1, z1, x2, y2, z2, 1, 0, 0, combinedLight, combinedOverlay);
+        // Top face (Y+)
+        addHorizontalQuad(vertexConsumer, poseStack, x1, y2, z1, x2, z2, 0, 1, 0, combinedLight, combinedOverlay);
 
         // Render latch (small centered piece on lid)
         renderLatch(poseStack, bufferSource, combinedLight, combinedOverlay);
@@ -153,31 +153,35 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         float z1 = 1f / 16f;
         float z2 = 2f / 16f;
 
-        // Front face
-        addQuad(vertexConsumer, poseStack, x1, y1, z1, x2, y2, z1, combinedLight, combinedOverlay);
-        // Top face
-        addQuadHorizontal(vertexConsumer, poseStack, x1, y2, z1, x2, z2, combinedLight, combinedOverlay);
+        // Front face (Z-)
+        addVerticalQuad(vertexConsumer, poseStack, x1, y1, z1, x2, y2, z1, 0, 0, -1, combinedLight, combinedOverlay);
+        // Top face (Y+)
+        addHorizontalQuad(vertexConsumer, poseStack, x1, y2, z1, x2, z2, 0, 1, 0, combinedLight, combinedOverlay);
     }
 
-    private void addQuad(VertexConsumer consumer, PoseStack poseStack,
-                         float x1, float y1, float z1, float x2, float y2, float z2,
-                         int combinedLight, int combinedOverlay) {
+    private void addVerticalQuad(VertexConsumer consumer, PoseStack poseStack,
+                                  float x1, float y1, float z1, float x2, float y2, float z2,
+                                  float nx, float ny, float nz,
+                                  int combinedLight, int combinedOverlay) {
         PoseStack.Pose pose = poseStack.last();
 
-        consumer.vertex(pose.pose(), x1, y1, z1).color(255, 255, 255, 255).uv(0, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 0, -1).endVertex();
-        consumer.vertex(pose.pose(), x2, y1, z2).color(255, 255, 255, 255).uv(1, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 0, -1).endVertex();
-        consumer.vertex(pose.pose(), x2, y2, z2).color(255, 255, 255, 255).uv(1, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 0, -1).endVertex();
-        consumer.vertex(pose.pose(), x1, y2, z1).color(255, 255, 255, 255).uv(0, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 0, -1).endVertex();
+        // For proper face culling, vertices must be in counter-clockwise order when viewed from outside
+        consumer.vertex(pose.pose(), x1, y1, z1).color(255, 255, 255, 255).uv(0, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.vertex(pose.pose(), x1, y2, z1).color(255, 255, 255, 255).uv(0, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.vertex(pose.pose(), x2, y2, z2).color(255, 255, 255, 255).uv(1, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.vertex(pose.pose(), x2, y1, z2).color(255, 255, 255, 255).uv(1, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
     }
 
-    private void addQuadHorizontal(VertexConsumer consumer, PoseStack poseStack,
-                                   float x1, float y, float z1, float x2, float z2,
-                                   int combinedLight, int combinedOverlay) {
+    private void addHorizontalQuad(VertexConsumer consumer, PoseStack poseStack,
+                                    float x1, float y, float z1, float x2, float z2,
+                                    float nx, float ny, float nz,
+                                    int combinedLight, int combinedOverlay) {
         PoseStack.Pose pose = poseStack.last();
 
-        consumer.vertex(pose.pose(), x1, y, z1).color(255, 255, 255, 255).uv(0, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 1, 0).endVertex();
-        consumer.vertex(pose.pose(), x2, y, z1).color(255, 255, 255, 255).uv(1, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 1, 0).endVertex();
-        consumer.vertex(pose.pose(), x2, y, z2).color(255, 255, 255, 255).uv(1, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 1, 0).endVertex();
-        consumer.vertex(pose.pose(), x1, y, z2).color(255, 255, 255, 255).uv(0, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), 0, 1, 0).endVertex();
+        // For proper face culling, vertices must be in counter-clockwise order when viewed from outside
+        consumer.vertex(pose.pose(), x1, y, z1).color(255, 255, 255, 255).uv(0, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.vertex(pose.pose(), x1, y, z2).color(255, 255, 255, 255).uv(0, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.vertex(pose.pose(), x2, y, z2).color(255, 255, 255, 255).uv(1, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.vertex(pose.pose(), x2, y, z1).color(255, 255, 255, 255).uv(1, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
     }
 }
