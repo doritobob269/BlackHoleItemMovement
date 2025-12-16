@@ -33,7 +33,10 @@ public class BlackHoleBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty ATTACHED = BooleanProperty.create("attached");
 
-    // Thin shapes for each direction (0.1 pixel thick)
+    // Full chest shape (for ATTACHED=false)
+    private static final VoxelShape SHAPE_CHEST = Block.box(1, 0, 1, 15, 14, 15);
+
+    // Thin shapes for each direction (for ATTACHED=true portable black holes)
     private static final VoxelShape SHAPE_DOWN = Block.box(0, 14, 0, 16, 16, 16);
     private static final VoxelShape SHAPE_UP = Block.box(0, 0, 0, 16, 2, 16);
     private static final VoxelShape SHAPE_NORTH = Block.box(0, 0, 14, 16, 16, 16);
@@ -77,6 +80,12 @@ public class BlackHoleBlock extends Block implements EntityBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
+        // If not attached, it's a chest block - use full chest shape
+        if (!state.getValue(ATTACHED)) {
+            return SHAPE_CHEST;
+        }
+
+        // Otherwise it's a portable black hole - use thin disc based on facing
         Direction facing = state.getValue(FACING);
         return switch (facing) {
             case DOWN -> SHAPE_DOWN;
