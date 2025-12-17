@@ -19,11 +19,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,30 +51,6 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
 
     public ItemStackHandler getInventory() {
         return inventory;
-    }
-
-    private LazyOptional<IItemHandler> inventoryCapability = LazyOptional.of(() -> inventory);
-
-    @Override
-    public void invalidateCaps() {
-        super.invalidateCaps();
-        inventoryCapability.invalidate();
-    }
-
-    @Override
-    public void reviveCaps() {
-        super.reviveCaps();
-        inventoryCapability = LazyOptional.of(() -> inventory);
-    }
-
-    @Nonnull
-    @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        // Expose inventory on all sides for chest blocks (not portals)
-        if (!this.getBlockState().getValue(BlackHoleBlock.ATTACHED) && cap == ForgeCapabilities.ITEM_HANDLER) {
-            return inventoryCapability.cast();
-        }
-        return super.getCapability(cap, side);
     }
 
     public void startOpen() {
@@ -163,13 +136,11 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
                 BlockEntity sourceBE = level.getBlockEntity(sourcePos);
                 if (sourceBE == null) return;
 
-                LazyOptional<IItemHandler> srcCap = sourceBE.getCapability(ForgeCapabilities.ITEM_HANDLER, facing);
-                if (!srcCap.isPresent()) {
-                    srcCap = sourceBE.getCapability(ForgeCapabilities.ITEM_HANDLER, null);
+                IItemHandler source = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, sourcePos, facing);
+                if (source == null) {
+                    source = level.getCapability(net.neoforged.neoforge.capabilities.Capabilities.ItemHandler.BLOCK, sourcePos, null);
                 }
-                if (!srcCap.isPresent()) return;
-
-                IItemHandler source = srcCap.orElse(null);
+                if (source == null) return;
 
                 // Get target chest's inventory
                 BlockPos target = blackHole.getTarget();

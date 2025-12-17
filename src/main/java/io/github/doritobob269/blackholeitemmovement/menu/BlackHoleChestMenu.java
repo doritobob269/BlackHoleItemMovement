@@ -11,11 +11,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class BlackHoleChestMenu extends AbstractContainerMenu {
     private final BlackHoleBlockEntity blockEntity;
-    private final net.minecraftforge.items.ItemStackHandler chestInventory;
+    private final net.neoforged.neoforge.items.ItemStackHandler chestInventory;
     private final BlockPos pos;
 
     // Client/Server constructor for singleplayer
@@ -35,7 +35,7 @@ public class BlackHoleChestMenu extends AbstractContainerMenu {
         }
 
         // Get this chest's inventory
-        this.chestInventory = this.blockEntity != null ? this.blockEntity.getInventory() : new net.minecraftforge.items.ItemStackHandler(27);
+        this.chestInventory = this.blockEntity != null ? this.blockEntity.getInventory() : new net.neoforged.neoforge.items.ItemStackHandler(27);
 
         // Add black hole chest inventory slots (3 rows of 9 = 27 slots)
         for (int row = 0; row < 3; row++) {

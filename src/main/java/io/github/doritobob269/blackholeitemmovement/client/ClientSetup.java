@@ -2,15 +2,15 @@ package io.github.doritobob269.blackholeitemmovement.client;
 
 import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
 import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
-@Mod.EventBusSubscriber(modid = "blackholeitemmovement", bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = "blackholeitemmovement", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientSetup {
 
     private static final BlackHoleChestItemRenderer CHEST_ITEM_RENDERER = new BlackHoleChestItemRenderer();
@@ -18,12 +18,13 @@ public class ClientSetup {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            MenuScreens.register(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), BlackHoleChestScreen::new);
             BlockEntityRenderers.register(ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get(), BlackHoleChestRenderer::new);
-
-            // Set render type for transparent textures
-            ItemBlockRenderTypes.setRenderLayer(ModRegistry.BLACK_HOLE_BLOCK.get(), RenderType.cutout());
         });
+    }
+
+    @SubscribeEvent
+    public static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), BlackHoleChestScreen::new);
     }
 
     public static BlackHoleChestItemRenderer getChestItemRenderer() {

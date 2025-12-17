@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -61,9 +62,9 @@ public class BlackHoleItem extends Item {
             return InteractionResult.FAIL;
         }
 
-        boolean hasInventory = clickedBE.getCapability(net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER, ctx.getClickedFace()).isPresent();
+        boolean hasInventory = level.getCapability(Capabilities.ItemHandler.BLOCK, clicked, ctx.getClickedFace()) != null;
         if (!hasInventory) {
-            hasInventory = clickedBE.getCapability(net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER, null).isPresent();
+            hasInventory = level.getCapability(Capabilities.ItemHandler.BLOCK, clicked, null) != null;
         }
 
         if (!hasInventory) {
