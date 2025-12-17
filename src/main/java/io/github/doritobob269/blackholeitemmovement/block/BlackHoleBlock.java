@@ -101,6 +101,12 @@ public class BlackHoleBlock extends Block implements EntityBlock {
     }
 
     @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
+        // Use the same shape for collision as for visual bounds
+        return getShape(state, level, pos, ctx);
+    }
+
+    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide) {
             BlockEntity be = level.getBlockEntity(pos);

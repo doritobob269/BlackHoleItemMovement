@@ -78,11 +78,11 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
                                   int combinedLight, int combinedOverlay) {
         VertexConsumer vertexConsumer = CHEST_MATERIAL.buffer(bufferSource, RenderType::entityCutout);
 
-        // Render the base of the chest (1/16 to 15/16 on X/Z, 0 to 10/16 on Y)
+        // Render the base of the chest (1/16 to 15/16 on X/Z, 0 to 9/16 on Y)
         float x1 = 1f / 16f;
         float x2 = 15f / 16f;
         float y1 = 0f;
-        float y2 = 10f / 16f;
+        float y2 = 9f / 16f;
         float z1 = 1f / 16f;
         float z2 = 15f / 16f;
 
@@ -134,6 +134,8 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         addVerticalQuad(vertexConsumer, poseStack, x2, y1, z1, x2, y2, z2, 1, 0, 0, combinedLight, combinedOverlay);
         // Top face (Y+)
         addHorizontalQuad(vertexConsumer, poseStack, x1, y2, z1, x2, z2, 0, 1, 0, combinedLight, combinedOverlay);
+        // Bottom face (Y-) - underside of lid
+        addHorizontalQuad(vertexConsumer, poseStack, x1, y1, z2, x2, z1, 0, -1, 0, combinedLight, combinedOverlay);
 
         // Render latch (small centered piece on lid)
         renderLatch(poseStack, bufferSource, combinedLight, combinedOverlay);
@@ -145,18 +147,26 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
                              int combinedLight, int combinedOverlay) {
         VertexConsumer vertexConsumer = LATCH_MATERIAL.buffer(bufferSource, RenderType::entityCutout);
 
-        // Small latch in center of lid front
-        float x1 = 7f / 16f;
+        // Small latch in center of lid front (vanilla chest style)
+        float x1 = 7f / 16f;     // Center horizontally
         float x2 = 9f / 16f;
-        float y1 = 9f / 16f;
-        float y2 = 11f / 16f;
-        float z1 = 1f / 16f;
-        float z2 = 2f / 16f;
+        float y1 = 7f / 16f;     // Lower position on lid
+        float y2 = 11f / 16f;    // Taller latch
+        float z1 = 0f;           // Extends to the edge of the block
+        float z2 = 1f / 16f;     // Full pixel depth
 
-        // Front face (Z-)
+        // Front face (Z-) - visible from outside
         addVerticalQuad(vertexConsumer, poseStack, x1, y1, z1, x2, y2, z1, 0, 0, -1, combinedLight, combinedOverlay);
+        // Back face (Z+) - visible when chest is open
+        addVerticalQuad(vertexConsumer, poseStack, x2, y1, z2, x1, y2, z2, 0, 0, 1, combinedLight, combinedOverlay);
+        // Left face (X-)
+        addVerticalQuad(vertexConsumer, poseStack, x1, y1, z2, x1, y2, z1, -1, 0, 0, combinedLight, combinedOverlay);
+        // Right face (X+)
+        addVerticalQuad(vertexConsumer, poseStack, x2, y1, z1, x2, y2, z2, 1, 0, 0, combinedLight, combinedOverlay);
         // Top face (Y+)
         addHorizontalQuad(vertexConsumer, poseStack, x1, y2, z1, x2, z2, 0, 1, 0, combinedLight, combinedOverlay);
+        // Bottom face (Y-) - might be visible through gap
+        addHorizontalQuad(vertexConsumer, poseStack, x1, y1, z2, x2, z1, 0, -1, 0, combinedLight, combinedOverlay);
     }
 
     private void addVerticalQuad(VertexConsumer consumer, PoseStack poseStack,
