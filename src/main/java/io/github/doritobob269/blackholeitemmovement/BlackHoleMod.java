@@ -14,5 +14,6 @@ public class BlackHoleMod {
         ModRegistry.ITEMS.register(modBus);
         ModRegistry.BLOCK_ENTITIES.register(modBus);
         ModRegistry.MENUS.register(modBus);
+        ModRegistry.CREATIVE_TABS.register(modBus);
     }
 }

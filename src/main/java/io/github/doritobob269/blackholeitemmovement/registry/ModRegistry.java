@@ -4,9 +4,13 @@ import io.github.doritobob269.blackholeitemmovement.BlackHoleMod;
 import io.github.doritobob269.blackholeitemmovement.block.BlackHoleBlock;
 import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
 import io.github.doritobob269.blackholeitemmovement.item.BlackHoleItem;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
@@ -19,6 +23,7 @@ public class ModRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, BlackHoleMod.MODID);
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, BlackHoleMod.MODID);
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, BlackHoleMod.MODID);
+    public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BlackHoleMod.MODID);
 
     public static final RegistryObject<Block> BLACK_HOLE_BLOCK = BLOCKS.register("black_hole", () -> new BlackHoleBlock(Block.Properties.of().noCollission().strength(0.1f)));
 
@@ -41,4 +46,13 @@ public class ModRegistry {
     public static final RegistryObject<MenuType<io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu>> BLACK_HOLE_CHEST_MENU = MENUS.register("black_hole_chest", () -> IForgeMenuType.create((windowId, inv, data) -> {
         return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, inv, inv.player.level().getBlockEntity(data.readBlockPos()));
     }));
+
+    public static final RegistryObject<CreativeModeTab> BLACK_HOLE_TAB = CREATIVE_TABS.register("black_hole_tab", () -> CreativeModeTab.builder()
+        .title(Component.literal("Black Hole"))
+        .icon(() -> new ItemStack(BLACK_HOLE_ITEM.get()))
+        .displayItems((parameters, output) -> {
+            output.accept(BLACK_HOLE_ITEM.get());
+            output.accept(BLACK_HOLE_BLOCK_ITEM.get());
+        })
+        .build());
 }
