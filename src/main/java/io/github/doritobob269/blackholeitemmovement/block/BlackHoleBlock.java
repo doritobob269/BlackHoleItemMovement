@@ -13,10 +13,13 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -31,6 +34,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.level.block.RenderShape;
 import javax.annotation.Nullable;
+import java.util.List;
 
 public class BlackHoleBlock extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -70,7 +74,15 @@ public class BlackHoleBlock extends Block implements EntityBlock {
         builder.add(FACING, ATTACHED);
     }
 
-
+    @Override
+    public float getDestroyProgress(BlockState state, Player player, BlockGetter level, BlockPos pos) {
+        // Portals (ATTACHED=true) break instantly with any tool or no tool
+        if (state.getValue(ATTACHED)) {
+            return 1.0f;
+        }
+        // Black Hole Chest (ATTACHED=false) uses normal breaking logic (requires diamond pickaxe)
+        return super.getDestroyProgress(state, player, level, pos);
+    }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
@@ -146,5 +158,37 @@ public class BlackHoleBlock extends Block implements EntityBlock {
             return (BlockEntityTicker<T>) io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity.createTicker((BlockEntityType<T>) type);
         }
         return null;
+    }
+
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        // Only drop contents if this is a chest (not a portal) and the block is actually being removed
+        if (!state.is(newState.getBlock()) && !state.getValue(ATTACHED)) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity instanceof BlackHoleBlockEntity blackHole) {
+                // Drop all inventory contents
+                net.neoforged.neoforge.items.ItemStackHandler inventory = blackHole.getInventory();
+                for (int i = 0; i < inventory.getSlots(); i++) {
+                    ItemStack stack = inventory.getStackInSlot(i);
+                    if (!stack.isEmpty()) {
+                        Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), stack);
+                    }
+                }
+            }
+        }
+        super.onRemove(state, level, pos, newState, movedByPiston);
+    }
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        List<ItemStack> drops = super.getDrops(state, params);
+
+        // Only chest blocks (ATTACHED=false) can drop as items
+        // Portals (ATTACHED=true) never drop as items
+        if (state.getValue(ATTACHED)) {
+            drops.clear();
+        }
+
+        return drops;
     }
 }
