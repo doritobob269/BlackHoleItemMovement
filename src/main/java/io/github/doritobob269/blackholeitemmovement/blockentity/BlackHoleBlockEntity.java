@@ -5,6 +5,8 @@ import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -211,6 +213,7 @@ public class BlackHoleBlockEntity extends BlockEntity {
 
                     // Remove portal after 5 seconds (100 ticks) of inactivity
                     if (blackHole.ticksSinceLastExtraction >= 100) {
+                        level.playSound(null, pos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 0.8f, 1.5f);
                         level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
                         return;
                     }
@@ -224,6 +227,7 @@ public class BlackHoleBlockEntity extends BlockEntity {
                 }
 
                 if (sourceEmpty) {
+                    level.playSound(null, pos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 0.8f, 1.5f);
                     level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
                 }
             }
