@@ -105,9 +105,10 @@ public class BlackHoleBlock extends Block implements EntityBlock {
             boolean isPortableBlackHole = state.getValue(ATTACHED);
             if (!isPortableBlackHole) {
                 // This is a Black Hole Chest, open GUI
-                if (!level.isClientSide) {
+                if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
                     level.playSound(null, pos, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.1f + 0.9f);
-                    player.openMenu(bhbe);
+                    // Open menu with packet data to send BlockPos to client
+                    serverPlayer.openMenu(bhbe, buf -> buf.writeBlockPos(pos));
                 }
                 return InteractionResult.SUCCESS;
             } else {

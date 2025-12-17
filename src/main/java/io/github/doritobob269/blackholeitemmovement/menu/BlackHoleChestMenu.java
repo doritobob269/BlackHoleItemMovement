@@ -8,6 +8,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -16,22 +17,28 @@ import net.neoforged.neoforge.items.SlotItemHandler;
 public class BlackHoleChestMenu extends AbstractContainerMenu {
     private final BlackHoleBlockEntity blockEntity;
     private final net.neoforged.neoforge.items.ItemStackHandler chestInventory;
-    private final BlockPos pos;
+    private final ContainerLevelAccess access;
 
-    // Client/Server constructor for singleplayer
+    // Client/Server constructor
     public BlackHoleChestMenu(int windowId, Inventory playerInv) {
-        this(windowId, playerInv, BlockPos.ZERO, playerInv.player.level());
+        this(windowId, playerInv, null, ContainerLevelAccess.NULL);
     }
 
+    // Server constructor
     public BlackHoleChestMenu(int windowId, Inventory playerInv, BlockPos pos, net.minecraft.world.level.Level level) {
-        super(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), windowId);
-        this.pos = pos;
-        BlockEntity be = level.getBlockEntity(pos);
-        this.blockEntity = be instanceof BlackHoleBlockEntity ? (BlackHoleBlockEntity) be : null;
+        this(windowId, playerInv,
+            level.getBlockEntity(pos) instanceof BlackHoleBlockEntity ? (BlackHoleBlockEntity) level.getBlockEntity(pos) : null,
+            ContainerLevelAccess.create(level, pos));
+    }
 
-        // Notify block entity that chest is being opened
+    private BlackHoleChestMenu(int windowId, Inventory playerInv, BlackHoleBlockEntity blockEntity, ContainerLevelAccess access) {
+        super(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), windowId);
+        this.blockEntity = blockEntity;
+        this.access = access;
+
+        // Open chest - this works on both client and server
         if (this.blockEntity != null) {
-            this.blockEntity.startOpen();
+            this.blockEntity.startOpen(playerInv.player);
         }
 
         // Get this chest's inventory
@@ -89,16 +96,17 @@ public class BlackHoleChestMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return blockEntity != null && !blockEntity.isRemoved() && player.distanceToSqr(blockEntity.getBlockPos().getX() + 0.5, blockEntity.getBlockPos().getY() + 0.5, blockEntity.getBlockPos().getZ() + 0.5) <= 64.0;
+        return stillValid(access, player, ModRegistry.BLACK_HOLE_BLOCK.get());
     }
 
     @Override
     public void removed(Player player) {
         super.removed(player);
-        if (blockEntity != null && !blockEntity.isRemoved()) {
-            // Notify block entity that chest is being closed
-            blockEntity.stopOpen();
-            player.level().playSound(null, blockEntity.getBlockPos(), SoundEvents.CHEST_CLOSE, SoundSource.BLOCKS, 0.5f, player.level().random.nextFloat() * 0.1f + 0.9f);
+        if (this.blockEntity != null) {
+            this.blockEntity.stopOpen(player);
         }
+        access.execute((level, pos) -> {
+            level.playSound(null, pos, SoundEvents.CHEST_CLOSE, SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.1f + 0.9f);
+        });
     }
 }

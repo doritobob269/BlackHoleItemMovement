@@ -6,6 +6,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
@@ -42,8 +43,8 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
     private float openness;
     private float oOpenness;
 
-    // Portal inactivity timer (in ticks, 100 ticks = 5 seconds)
-    private int ticksSinceLastExtraction = 0;
+    // Portal lifetime timer - portal will close after 100 ticks (5 seconds)
+    private int portalLifetime = 0;
 
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
         super(ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get(), pos, state);
@@ -53,16 +54,26 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
         return inventory;
     }
 
-    public void startOpen() {
+    public void startOpen(Player player) {
+        if (this.level == null) return;
+
+        // Increment on both sides
         this.openCount++;
-        if (this.level != null) {
+
+        // Sync to client via block event (server only)
+        if (!this.level.isClientSide) {
             this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
         }
     }
 
-    public void stopOpen() {
+    public void stopOpen(Player player) {
+        if (this.level == null) return;
+
+        // Decrement on both sides
         this.openCount--;
-        if (this.level != null) {
+
+        // Sync to client via block event (server only)
+        if (!this.level.isClientSide) {
             this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
         }
     }
@@ -98,9 +109,6 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
         if (tag.contains("Inventory")) {
             inventory.deserializeNBT(provider, tag.getCompound("Inventory"));
         }
-        if (tag.contains("TicksSinceLastExtraction")) {
-            this.ticksSinceLastExtraction = tag.getInt("TicksSinceLastExtraction");
-        }
     }
 
     @Override
@@ -110,7 +118,6 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
             tag.putLong("TargetPos", this.targetPos.asLong());
         }
         tag.put("Inventory", inventory.serializeNBT(provider));
-        tag.putInt("TicksSinceLastExtraction", this.ticksSinceLastExtraction);
     }
 
     public void setTarget(BlockPos pos) {
@@ -185,20 +192,19 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
                     }
                 }
 
-                // Reset timer if items were extracted
-                if (extractedAny) {
-                    blackHole.ticksSinceLastExtraction = 0;
-                    blackHole.setChanged();
-                } else {
-                    // Increment timer if no items were moved
-                    blackHole.ticksSinceLastExtraction++;
+                // Increment portal lifetime
+                blackHole.portalLifetime++;
 
-                    // Remove portal after 5 seconds (100 ticks) of inactivity
-                    if (blackHole.ticksSinceLastExtraction >= 100) {
-                        level.playSound(null, pos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 0.8f, 1.5f);
-                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-                        return;
-                    }
+                // Remove portal after 5 seconds (100 ticks) from placement
+                if (blackHole.portalLifetime >= 100) {
+                    level.playSound(null, pos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 0.8f, 1.5f);
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                    return;
+                }
+
+                // Mark as changed if items were extracted
+                if (extractedAny) {
+                    blackHole.setChanged();
                 }
 
                 // Check if source has any extractable items left

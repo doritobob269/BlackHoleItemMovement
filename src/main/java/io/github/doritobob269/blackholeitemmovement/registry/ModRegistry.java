@@ -46,7 +46,10 @@ public class ModRegistry {
     });
 
     public static final DeferredHolder<MenuType<?>, MenuType<io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu>> BLACK_HOLE_CHEST_MENU = MENUS.register("black_hole_chest", () ->
-        new MenuType<>((windowId, inv) -> new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, inv), net.minecraft.world.flag.FeatureFlags.VANILLA_SET));
+        net.neoforged.neoforge.common.extensions.IMenuTypeExtension.create((windowId, inv, buf) -> {
+            net.minecraft.core.BlockPos pos = buf.readBlockPos();
+            return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, inv, pos, inv.player.level());
+        }));
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BLACK_HOLE_TAB = CREATIVE_TABS.register("black_hole_tab", () -> CreativeModeTab.builder()
         .title(Component.literal("Black Hole"))
