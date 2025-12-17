@@ -166,17 +166,8 @@ public class BlackHoleBlockEntity extends BlockEntity {
 
                 IItemHandler source = srcCap.orElse(null);
 
-                BlockPos target = blackHole.getTarget();
-                IItemHandler receiver = null;
-                if (target != null) {
-                    BlockEntity targetBE = level.getBlockEntity(target);
-                    if (targetBE != null) {
-                        LazyOptional<IItemHandler> recvCap = targetBE.getCapability(ForgeCapabilities.ITEM_HANDLER, null);
-                        if (recvCap.isPresent()) receiver = recvCap.orElse(null);
-                    }
-                }
-
                 // Get target chest's inventory
+                BlockPos target = blackHole.getTarget();
                 IItemHandler targetInventory = null;
                 if (target != null) {
                     BlockEntity targetBE = level.getBlockEntity(target);
