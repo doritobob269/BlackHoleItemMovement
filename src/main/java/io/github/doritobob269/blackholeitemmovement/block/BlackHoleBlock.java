@@ -18,7 +18,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -67,7 +66,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, ATTACHED);
     }
 
@@ -92,13 +91,11 @@ public class BlackHoleBlock extends Block implements EntityBlock {
         };
     }
 
-    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
         // Use the same shape for collision as for visual bounds
         return getShape(state, level, pos, ctx);
     }
 
-    @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         // Don't open GUI if player is holding the chest block item (they want to place another chest)
         ItemStack heldItem = player.getItemInHand(hand);
@@ -115,17 +112,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                 // This is a Black Hole Chest, open GUI
                 if (!level.isClientSide) {
                     level.playSound(null, pos, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.1f + 0.9f);
-                    NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
-                        @Override
-                        public Component getDisplayName() {
-                            return Component.literal("Black Hole Chest");
-                        }
-
-                        @Override
-                        public AbstractContainerMenu createMenu(int windowId, Inventory playerInv, Player player) {
-                            return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, playerInv, be);
-                        }
-                    }, pos);
+                    player.openMenu(bhbe);
                 }
                 return InteractionResult.SUCCESS;
             } else {

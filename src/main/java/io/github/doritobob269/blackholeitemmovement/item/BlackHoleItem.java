@@ -25,10 +25,11 @@ public class BlackHoleItem extends Item {
     public BlackHoleItem(Properties props) { super(props); }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, level, tooltip, flag);
-        if (stack.hasTag() && stack.getTag().contains("TargetPos")) {
-            long longPos = stack.getTag().getLong("TargetPos");
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
+        var customData = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY);
+        if (customData.contains("TargetPos")) {
+            long longPos = customData.copyTag().getLong("TargetPos");
             BlockPos target = BlockPos.of(longPos);
             tooltip.add(Component.literal("Linked to: " + target.toShortString()).withStyle(ChatFormatting.AQUA));
         } else {
@@ -46,7 +47,9 @@ public class BlackHoleItem extends Item {
         BlockState clickedState = level.getBlockState(clicked);
         if (!level.isClientSide && clickedState.is(ModRegistry.BLACK_HOLE_BLOCK.get()) && !clickedState.getValue(BlockStateProperties.ATTACHED)) {
             ItemStack stack = ctx.getItemInHand();
-            stack.getOrCreateTag().putLong("TargetPos", clicked.asLong());
+            var tag = new net.minecraft.nbt.CompoundTag();
+            tag.putLong("TargetPos", clicked.asLong());
+            stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(tag));
             if (player != null) player.displayClientMessage(Component.literal("Bound to receiver at " + clicked.toShortString()), true);
             return InteractionResult.SUCCESS;
         }
@@ -76,7 +79,8 @@ public class BlackHoleItem extends Item {
 
         // Check if the item is bound to a chest
         ItemStack stack = ctx.getItemInHand();
-        if (!stack.hasTag() || !stack.getTag().contains("TargetPos")) {
+        var customData = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY);
+        if (!customData.contains("TargetPos")) {
             if (!level.isClientSide && player != null) {
                 player.displayClientMessage(Component.literal("Black hole portal must be bound to a black hole chest first!").withStyle(ChatFormatting.RED), true);
             }
@@ -92,7 +96,7 @@ public class BlackHoleItem extends Item {
 
             BlockEntity be = level.getBlockEntity(placePos);
             if (be instanceof BlackHoleBlockEntity) {
-                long longPos = stack.getTag().getLong("TargetPos");
+                long longPos = customData.copyTag().getLong("TargetPos");
                 BlockPos target = BlockPos.of(longPos);
                 ((BlackHoleBlockEntity) be).setTarget(target);
             }

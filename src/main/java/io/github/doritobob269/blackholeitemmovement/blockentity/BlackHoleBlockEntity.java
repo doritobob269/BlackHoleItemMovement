@@ -5,8 +5,13 @@ import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,7 +28,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BlackHoleBlockEntity extends BlockEntity {
+public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
     @Nullable
     private BlockPos targetPos;
 
@@ -97,13 +102,13 @@ public class BlackHoleBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
+        super.loadAdditional(tag, provider);
         if (tag.contains("TargetPos")) {
             this.targetPos = BlockPos.of(tag.getLong("TargetPos"));
         }
         if (tag.contains("Inventory")) {
-            inventory.deserializeNBT(tag.getCompound("Inventory"));
+            inventory.deserializeNBT(provider, tag.getCompound("Inventory"));
         }
         if (tag.contains("TicksSinceLastExtraction")) {
             this.ticksSinceLastExtraction = tag.getInt("TicksSinceLastExtraction");
@@ -111,12 +116,12 @@ public class BlackHoleBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    protected void saveAdditional(CompoundTag tag, net.minecraft.core.HolderLookup.Provider provider) {
+        super.saveAdditional(tag, provider);
         if (this.targetPos != null) {
             tag.putLong("TargetPos", this.targetPos.asLong());
         }
-        tag.put("Inventory", inventory.serializeNBT());
+        tag.put("Inventory", inventory.serializeNBT(provider));
         tag.putInt("TicksSinceLastExtraction", this.ticksSinceLastExtraction);
     }
 
@@ -223,5 +228,16 @@ public class BlackHoleBlockEntity extends BlockEntity {
                 }
             }
         };
+    }
+
+    // MenuProvider implementation
+    @Override
+    public Component getDisplayName() {
+        return Component.literal("Black Hole Chest");
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player) {
+        return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, playerInventory, this);
     }
 }

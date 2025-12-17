@@ -19,12 +19,12 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
 
     private static final Material CHEST_MATERIAL = new Material(
         InventoryMenu.BLOCK_ATLAS,
-        new ResourceLocation("minecraft", "block/obsidian")
+        ResourceLocation.withDefaultNamespace("block/obsidian")
     );
 
     private static final Material LATCH_MATERIAL = new Material(
         InventoryMenu.BLOCK_ATLAS,
-        new ResourceLocation("minecraft", "block/iron_block")
+        ResourceLocation.withDefaultNamespace("block/iron_block")
     );
 
     public BlackHoleChestRenderer(BlockEntityRendererProvider.Context context) {
@@ -176,10 +176,10 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         PoseStack.Pose pose = poseStack.last();
 
         // For proper face culling, vertices must be in counter-clockwise order when viewed from outside
-        consumer.vertex(pose.pose(), x1, y1, z1).color(255, 255, 255, 255).uv(0, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
-        consumer.vertex(pose.pose(), x1, y2, z1).color(255, 255, 255, 255).uv(0, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
-        consumer.vertex(pose.pose(), x2, y2, z2).color(255, 255, 255, 255).uv(1, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
-        consumer.vertex(pose.pose(), x2, y1, z2).color(255, 255, 255, 255).uv(1, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.addVertex(pose, x1, y1, z1).setColor(255, 255, 255, 255).setUv(0, 1).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
+        consumer.addVertex(pose, x1, y2, z1).setColor(255, 255, 255, 255).setUv(0, 0).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
+        consumer.addVertex(pose, x2, y2, z2).setColor(255, 255, 255, 255).setUv(1, 0).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
+        consumer.addVertex(pose, x2, y1, z2).setColor(255, 255, 255, 255).setUv(1, 1).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
     }
 
     private void addHorizontalQuad(VertexConsumer consumer, PoseStack poseStack,
@@ -189,9 +189,9 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         PoseStack.Pose pose = poseStack.last();
 
         // For proper face culling, vertices must be in counter-clockwise order when viewed from outside
-        consumer.vertex(pose.pose(), x1, y, z1).color(255, 255, 255, 255).uv(0, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
-        consumer.vertex(pose.pose(), x1, y, z2).color(255, 255, 255, 255).uv(0, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
-        consumer.vertex(pose.pose(), x2, y, z2).color(255, 255, 255, 255).uv(1, 1).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
-        consumer.vertex(pose.pose(), x2, y, z1).color(255, 255, 255, 255).uv(1, 0).overlayCoords(combinedOverlay).uv2(combinedLight).normal(pose.normal(), nx, ny, nz).endVertex();
+        consumer.addVertex(pose, x1, y, z1).setColor(255, 255, 255, 255).setUv(0, 0).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
+        consumer.addVertex(pose, x1, y, z2).setColor(255, 255, 255, 255).setUv(0, 1).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
+        consumer.addVertex(pose, x2, y, z2).setColor(255, 255, 255, 255).setUv(1, 1).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
+        consumer.addVertex(pose, x2, y, z1).setColor(255, 255, 255, 255).setUv(1, 0).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
     }
 }
