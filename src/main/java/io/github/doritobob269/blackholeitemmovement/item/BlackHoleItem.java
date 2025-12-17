@@ -33,7 +33,7 @@ public class BlackHoleItem extends Item {
             tooltip.add(Component.literal("Linked to: " + target.toShortString()).withStyle(ChatFormatting.AQUA));
         } else {
             tooltip.add(Component.literal("Not bound to any chest").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.literal("Sneak + Right-click a Black Hole Chest to bind").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.literal("Sneak + Right-click a black hole chest to bind").withStyle(ChatFormatting.GRAY));
         }
     }
 
@@ -78,7 +78,7 @@ public class BlackHoleItem extends Item {
         ItemStack stack = ctx.getItemInHand();
         if (!stack.hasTag() || !stack.getTag().contains("TargetPos")) {
             if (!level.isClientSide && player != null) {
-                player.displayClientMessage(Component.literal("Black hole portal must be bound to a chest first!").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(Component.literal("Black hole portal must be bound to a black hole chest first!").withStyle(ChatFormatting.RED), true);
             }
             return InteractionResult.FAIL;
         }

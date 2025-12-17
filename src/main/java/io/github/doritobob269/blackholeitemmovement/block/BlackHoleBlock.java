@@ -106,14 +106,14 @@ public class BlackHoleBlock extends Block implements EntityBlock {
             return InteractionResult.PASS;
         }
 
-        if (!level.isClientSide) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof BlackHoleBlockEntity) {
-                BlackHoleBlockEntity bhbe = (BlackHoleBlockEntity) be;
-                // Only open GUI if not attached to a container (portable black holes have ATTACHED=true)
-                boolean isPortableBlackHole = state.getValue(ATTACHED);
-                if (!isPortableBlackHole) {
-                    // This is a Black Hole Chest, open GUI
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof BlackHoleBlockEntity) {
+            BlackHoleBlockEntity bhbe = (BlackHoleBlockEntity) be;
+            // Only open GUI if not attached to a container (portable black holes have ATTACHED=true)
+            boolean isPortableBlackHole = state.getValue(ATTACHED);
+            if (!isPortableBlackHole) {
+                // This is a Black Hole Chest, open GUI
+                if (!level.isClientSide) {
                     level.playSound(null, pos, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.1f + 0.9f);
                     NetworkHooks.openScreen((ServerPlayer) player, new MenuProvider() {
                         @Override
@@ -126,18 +126,20 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                             return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, playerInv, be);
                         }
                     }, pos);
-                    return InteractionResult.SUCCESS;
-                } else {
-                    // Show toast with linked chest coordinates when clicking portal with empty hand
-                    if (heldItem.isEmpty()) {
+                }
+                return InteractionResult.SUCCESS;
+            } else {
+                // Show toast with linked chest coordinates when clicking portal with empty hand
+                if (heldItem.isEmpty()) {
+                    if (!level.isClientSide) {
                         BlockPos target = bhbe.getTarget();
                         if (target != null) {
-                            player.displayClientMessage(Component.literal("Linked to Black Hole Chest at " + target.toShortString()), true);
+                            player.displayClientMessage(Component.literal("Linked to black hole chest at " + target.toShortString()), true);
                         } else {
                             player.displayClientMessage(Component.literal("Not linked to any chest"), true);
                         }
-                        return InteractionResult.SUCCESS;
                     }
+                    return InteractionResult.SUCCESS;
                 }
             }
         }
