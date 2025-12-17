@@ -24,8 +24,14 @@ import javax.annotation.Nullable;
 public class BlackHoleBlockEntity extends BlockEntity {
     @Nullable
     private BlockPos targetPos;
-    @Nullable
-    private java.util.UUID ownerUUID;
+
+    // Chest inventory (27 slots)
+    private final ItemStackHandler inventory = new ItemStackHandler(27) {
+        @Override
+        protected void onContentsChanged(int slot) {
+            setChanged();
+        }
+    };
 
     // Chest animation fields
     private int openCount;
@@ -34,6 +40,10 @@ public class BlackHoleBlockEntity extends BlockEntity {
 
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
         super(ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get(), pos, state);
+    }
+
+    public ItemStackHandler getInventory() {
+        return inventory;
     }
 
     public void startOpen() {
@@ -63,8 +73,8 @@ public class BlackHoleBlockEntity extends BlockEntity {
         if (tag.contains("TargetPos")) {
             this.targetPos = BlockPos.of(tag.getLong("TargetPos"));
         }
-        if (tag.contains("OwnerUUID")) {
-            this.ownerUUID = tag.getUUID("OwnerUUID");
+        if (tag.contains("Inventory")) {
+            inventory.deserializeNBT(tag.getCompound("Inventory"));
         }
     }
 
@@ -74,9 +84,7 @@ public class BlackHoleBlockEntity extends BlockEntity {
         if (this.targetPos != null) {
             tag.putLong("TargetPos", this.targetPos.asLong());
         }
-        if (this.ownerUUID != null) {
-            tag.putUUID("OwnerUUID", this.ownerUUID);
-        }
+        tag.put("Inventory", inventory.serializeNBT());
     }
 
     public void setTarget(BlockPos pos) {
@@ -87,16 +95,6 @@ public class BlackHoleBlockEntity extends BlockEntity {
     @Nullable
     public BlockPos getTarget() {
         return targetPos;
-    }
-
-    public void setOwner(java.util.UUID uuid) {
-        this.ownerUUID = uuid;
-        setChanged();
-    }
-
-    @Nullable
-    public java.util.UUID getOwnerUUID() {
-        return ownerUUID;
     }
 
     private static ItemStack insertToHandler(IItemHandler dest, ItemStack stack) {
@@ -145,14 +143,12 @@ public class BlackHoleBlockEntity extends BlockEntity {
                     }
                 }
 
-                // Get owner's global inventory
-                java.util.UUID ownerUUID = blackHole.getOwnerUUID();
-                IItemHandler globalInventory = null;
-                if (ownerUUID != null && level.getServer() != null) {
-                    net.minecraft.server.level.ServerPlayer player = level.getServer().getPlayerList().getPlayer(ownerUUID);
-                    if (player != null) {
-                        globalInventory = player.getCapability(io.github.doritobob269.blackholeitemmovement.capability.BlackHoleCapabilities.PLAYER_BLACK_HOLE_INVENTORY)
-                            .map(inv -> inv.getInventory()).orElse(null);
+                // Get target chest's inventory
+                IItemHandler targetInventory = null;
+                if (target != null) {
+                    BlockEntity targetBE = level.getBlockEntity(target);
+                    if (targetBE instanceof BlackHoleBlockEntity) {
+                        targetInventory = ((BlackHoleBlockEntity) targetBE).getInventory();
                     }
                 }
 
@@ -163,8 +159,8 @@ public class BlackHoleBlockEntity extends BlockEntity {
                     if (avail.isEmpty()) continue;
 
                     ItemStack remainder = avail;
-                    if (globalInventory != null) {
-                        remainder = insertToHandler(globalInventory, avail.copy());
+                    if (targetInventory != null) {
+                        remainder = insertToHandler(targetInventory, avail.copy());
                     }
 
                     int inserted = avail.getCount() - remainder.getCount();

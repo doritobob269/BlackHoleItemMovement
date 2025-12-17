@@ -71,16 +71,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
         builder.add(FACING, ATTACHED);
     }
 
-    @Override
-    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
-        super.setPlacedBy(level, pos, state, placer, stack);
-        if (!level.isClientSide && placer instanceof Player) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof BlackHoleBlockEntity) {
-                ((BlackHoleBlockEntity) be).setOwner(placer.getUUID());
-            }
-        }
-    }
+
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
@@ -136,6 +127,17 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                         }
                     }, pos);
                     return InteractionResult.SUCCESS;
+                } else {
+                    // Show toast with linked chest coordinates when clicking portal with empty hand
+                    if (heldItem.isEmpty()) {
+                        BlockPos target = bhbe.getTarget();
+                        if (target != null) {
+                            player.displayClientMessage(Component.literal("Linked to Black Hole Chest at " + target.toShortString()), true);
+                        } else {
+                            player.displayClientMessage(Component.literal("Not linked to any chest"), true);
+                        }
+                        return InteractionResult.SUCCESS;
+                    }
                 }
             }
         }

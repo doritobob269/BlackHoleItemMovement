@@ -2,6 +2,7 @@ package io.github.doritobob269.blackholeitemmovement.item;
 
 import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
 import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -10,14 +11,31 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
+import javax.annotation.Nullable;
+import java.util.List;
+
 public class BlackHoleItem extends Item {
     public BlackHoleItem(Properties props) { super(props); }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, level, tooltip, flag);
+        if (stack.hasTag() && stack.getTag().contains("TargetPos")) {
+            long longPos = stack.getTag().getLong("TargetPos");
+            BlockPos target = BlockPos.of(longPos);
+            tooltip.add(Component.literal("Linked to: " + target.toShortString()).withStyle(ChatFormatting.AQUA));
+        } else {
+            tooltip.add(Component.literal("Not bound to any chest").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.literal("Sneak + Right-click a Black Hole Chest to bind").withStyle(ChatFormatting.GRAY));
+        }
+    }
 
     @Override
     public InteractionResult useOn(UseOnContext ctx) {
@@ -56,6 +74,15 @@ public class BlackHoleItem extends Item {
             return InteractionResult.PASS;
         }
 
+        // Check if the item is bound to a chest
+        ItemStack stack = ctx.getItemInHand();
+        if (!stack.hasTag() || !stack.getTag().contains("TargetPos")) {
+            if (!level.isClientSide && player != null) {
+                player.displayClientMessage(Component.literal("Black hole portal must be bound to a chest first!").withStyle(ChatFormatting.RED), true);
+            }
+            return InteractionResult.FAIL;
+        }
+
         // Place the black hole portal on the side of the container when crouching
         BlockPos placePos = ctx.getClickedPos().relative(ctx.getClickedFace());
         if (!level.isClientSide) {
@@ -63,15 +90,11 @@ public class BlackHoleItem extends Item {
             level.setBlock(placePos, state, 3);
             level.playSound(null, placePos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0f, 1.0f);
 
-            ItemStack stack = ctx.getItemInHand();
             BlockEntity be = level.getBlockEntity(placePos);
-            if (be instanceof BlackHoleBlockEntity && player != null) {
-                ((BlackHoleBlockEntity) be).setOwner(player.getUUID());
-                if (stack.hasTag() && stack.getTag().contains("TargetPos")) {
-                    long longPos = stack.getTag().getLong("TargetPos");
-                    BlockPos target = BlockPos.of(longPos);
-                    ((BlackHoleBlockEntity) be).setTarget(target);
-                }
+            if (be instanceof BlackHoleBlockEntity) {
+                long longPos = stack.getTag().getLong("TargetPos");
+                BlockPos target = BlockPos.of(longPos);
+                ((BlackHoleBlockEntity) be).setTarget(target);
             }
 
             if (player != null && !player.isCreative()) {

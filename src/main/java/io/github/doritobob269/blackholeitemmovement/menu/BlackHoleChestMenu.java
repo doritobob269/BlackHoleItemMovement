@@ -14,7 +14,7 @@ import net.minecraftforge.items.SlotItemHandler;
 
 public class BlackHoleChestMenu extends AbstractContainerMenu {
     private final BlackHoleBlockEntity blockEntity;
-    private final net.minecraftforge.items.ItemStackHandler globalInventory;
+    private final net.minecraftforge.items.ItemStackHandler chestInventory;
 
     public BlackHoleChestMenu(int windowId, Inventory playerInv, BlockEntity be) {
         super(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), windowId);
@@ -25,14 +25,13 @@ public class BlackHoleChestMenu extends AbstractContainerMenu {
             this.blockEntity.startOpen();
         }
 
-        // Get player's global black hole inventory
-        this.globalInventory = playerInv.player.getCapability(io.github.doritobob269.blackholeitemmovement.capability.BlackHoleCapabilities.PLAYER_BLACK_HOLE_INVENTORY)
-            .map(inv -> inv.getInventory()).orElse(new net.minecraftforge.items.ItemStackHandler(27));
+        // Get this chest's inventory
+        this.chestInventory = this.blockEntity != null ? this.blockEntity.getInventory() : new net.minecraftforge.items.ItemStackHandler(27);
 
         // Add black hole chest inventory slots (3 rows of 9 = 27 slots)
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                this.addSlot(new SlotItemHandler(globalInventory, col + row * 9, 8 + col * 18, 18 + row * 18));
+                this.addSlot(new SlotItemHandler(chestInventory, col + row * 9, 8 + col * 18, 18 + row * 18));
             }
         }
 
