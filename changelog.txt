@@ -14,7 +14,7 @@
  - 47.4.1  Deprecate EntityRenderersEvent.AddLayers functions that hard case to LivingEntityRenderers as the backing maps do not guarantee that type. (#10513)
            Co-authored-by: LexManos <LexManos@gmail.com>
  - 47.4.0  1.20.1 RB 4
-           https://forums.minecraftforge.net/topic/154387-forge-474-minecraft-1201/
+           Legacy Forge changelog - now NeoForge
 
 47.3
 ====
@@ -85,7 +85,7 @@
            Co-authored-by: Ven <tudurap.com@gmail.com>
  - 47.3.1  Fix boat travel distance being incorrect. Closes #9997 #9999
  - 47.3.0  1.20.1 RB 3
-           https://forums.minecraftforge.net/topic/139825-forge-473-minecraft-1201/
+           Legacy Forge changelog - now NeoForge
 
 47.2
 ====
@@ -1058,4 +1058,3 @@
             * Make "Potentially dangerous alternative prefix" a debug warning, not info.
             Co-authored-by: Curle <curle@gemwire.uk>
             Co-authored-by: sciwhiz12 <arnoldnunag12@gmail.com>
-

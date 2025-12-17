@@ -194,4 +194,14 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         consumer.addVertex(pose, x2, y, z2).setColor(255, 255, 255, 255).setUv(1, 1).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
         consumer.addVertex(pose, x2, y, z1).setColor(255, 255, 255, 255).setUv(1, 0).setOverlay(combinedOverlay).setLight(combinedLight).setNormal(pose, nx, ny, nz);
     }
+
+    @Override
+    public int getViewDistance() {
+        return 256;
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen(BlackHoleBlockEntity blockEntity) {
+        return true;
+    }
 }
