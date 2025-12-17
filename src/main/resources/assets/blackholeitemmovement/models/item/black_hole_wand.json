@@ -1,6 +1,7 @@
 {
   "parent": "item/handheld",
   "textures": {
-    "layer0": "blackholeitemmovement:item/black_hole_wand"
+    "layer0": "minecraft:item/stick",
+    "layer1": "blackholeitemmovement:item/black_hole_wand_overlay"
   }
 }
