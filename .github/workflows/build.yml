@@ -29,8 +29,13 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
+      - name: Get jar filename
+        id: jar-name
+        run: echo "filename=$(basename build/libs/*.jar .jar)" >> $GITHUB_OUTPUT
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: mod-jar
+          name: ${{ steps.jar-name.outputs.filename }}
           path: build/libs/*.jar
+          if-no-files-found: error
