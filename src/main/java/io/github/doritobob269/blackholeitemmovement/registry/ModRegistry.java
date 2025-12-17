@@ -26,7 +26,17 @@ public class ModRegistry {
 
     public static final RegistryObject<Item> BLACK_HOLE_ITEM = ITEMS.register("black_hole_item", () -> new BlackHoleItem(new Item.Properties()));
 
-    public static final RegistryObject<Item> BLACK_HOLE_BLOCK_ITEM = ITEMS.register("black_hole_block", () -> new BlockItem(BLACK_HOLE_BLOCK.get(), new Item.Properties()));
+    public static final RegistryObject<Item> BLACK_HOLE_BLOCK_ITEM = ITEMS.register("black_hole_block", () -> new BlockItem(BLACK_HOLE_BLOCK.get(), new Item.Properties()) {
+        @Override
+        public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> consumer) {
+            consumer.accept(new net.minecraftforge.client.extensions.common.IClientItemExtensions() {
+                @Override
+                public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                    return io.github.doritobob269.blackholeitemmovement.client.ClientSetup.getChestItemRenderer();
+                }
+            });
+        }
+    });
 
     public static final RegistryObject<MenuType<io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu>> BLACK_HOLE_CHEST_MENU = MENUS.register("black_hole_chest", () -> IForgeMenuType.create((windowId, inv, data) -> {
         return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, inv, inv.player.level().getBlockEntity(data.readBlockPos()));
