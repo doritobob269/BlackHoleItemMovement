@@ -38,6 +38,9 @@ public class BlackHoleBlockEntity extends BlockEntity {
     private float openness;
     private float oOpenness;
 
+    // Portal inactivity timer (in ticks, 100 ticks = 5 seconds)
+    private int ticksSinceLastExtraction = 0;
+
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
         super(ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get(), pos, state);
     }
@@ -100,6 +103,9 @@ public class BlackHoleBlockEntity extends BlockEntity {
         if (tag.contains("Inventory")) {
             inventory.deserializeNBT(tag.getCompound("Inventory"));
         }
+        if (tag.contains("TicksSinceLastExtraction")) {
+            this.ticksSinceLastExtraction = tag.getInt("TicksSinceLastExtraction");
+        }
     }
 
     @Override
@@ -109,6 +115,7 @@ public class BlackHoleBlockEntity extends BlockEntity {
             tag.putLong("TargetPos", this.targetPos.asLong());
         }
         tag.put("Inventory", inventory.serializeNBT());
+        tag.putInt("TicksSinceLastExtraction", this.ticksSinceLastExtraction);
     }
 
     public void setTarget(BlockPos pos) {
@@ -194,6 +201,21 @@ public class BlackHoleBlockEntity extends BlockEntity {
                     }
                 }
 
+                // Reset timer if items were extracted
+                if (extractedAny) {
+                    blackHole.ticksSinceLastExtraction = 0;
+                    blackHole.setChanged();
+                } else {
+                    // Increment timer if no items were moved
+                    blackHole.ticksSinceLastExtraction++;
+
+                    // Remove portal after 5 seconds (100 ticks) of inactivity
+                    if (blackHole.ticksSinceLastExtraction >= 100) {
+                        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+                        return;
+                    }
+                }
+
                 // Check if source has any extractable items left
                 boolean sourceEmpty = true;
                 for (int i = 0; i < source.getSlots(); i++) {
@@ -203,8 +225,6 @@ public class BlackHoleBlockEntity extends BlockEntity {
 
                 if (sourceEmpty) {
                     level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-                } else if (extractedAny) {
-                    blackHole.setChanged();
                 }
             }
         };
