@@ -60,10 +60,10 @@ public class BlackHoleBlock extends Block implements EntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Direction face = context.getClickedFace();
-        // Regular placement (chest blocks) should have ATTACHED=false
-        // Portable black holes set ATTACHED=true when placed
-        return this.defaultBlockState().setValue(FACING, face).setValue(ATTACHED, false);
+        // For chests, face the player's horizontal direction (like vanilla chests)
+        // For portable black holes (placed via item), use clicked face
+        Direction facing = context.getHorizontalDirection().getOpposite();
+        return this.defaultBlockState().setValue(FACING, facing).setValue(ATTACHED, false);
     }
 
     @Override

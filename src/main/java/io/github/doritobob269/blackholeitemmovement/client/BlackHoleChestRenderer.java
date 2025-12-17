@@ -51,8 +51,8 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
 
         // Rotate based on facing direction
         float rotation = switch (facing) {
-            case NORTH -> 180f;
-            case SOUTH -> 0f;
+            case NORTH -> 0f;
+            case SOUTH -> 180f;
             case WEST -> 90f;
             case EAST -> 270f;
             default -> 0f;
