@@ -77,12 +77,6 @@ minecraft {
             // You can set various levels here.
             // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
             property 'forge.logging.console.level', 'debug'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
         }
 
         client {
@@ -208,4 +202,40 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+// For Forge 1.21.1: Custom task to build JAR (non-reobf) and run client with mod from mods folder
+tasks.register('devClient') {
+    group = 'forgegradle runs'
+    description = 'Builds the mod JAR (dev/deobfuscated), copies to run/mods, and launches the client'
+    dependsOn 'classes'  // Build classes without creating JAR
+
+    doFirst {
+        // Disable reobfJar finalization temporarily for dev
+        tasks.named('jar').configure {
+            enabled = false
+        }
+        tasks.named('reobfJar').configure {
+            enabled = false
+        }
+    }
+
+    doLast {
+        def modsDir = file('run/mods')
+        modsDir.mkdirs()
+
+        // Create a JAR directly without reobfuscation
+        ant.jar(destfile: "run/mods/BlackHoleItemMovement-${minecraft_version}-${mod_version}.jar") {
+            fileset(dir: 'build/classes/java/main')
+            fileset(dir: 'build/resources/main')
+        }
+
+        // Delete build output to prevent module conflicts
+        delete 'build/classes'
+        delete 'build/resources'
+
+        println "Development JAR (deobfuscated) created in run/mods. Running client..."
+    }
+
+    finalizedBy 'runClient'
 }

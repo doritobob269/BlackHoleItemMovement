@@ -14,6 +14,7 @@ public class BlackHoleMod {
         ModRegistry.ITEMS.register(modBus);
         ModRegistry.BLOCK_ENTITIES.register(modBus);
         ModRegistry.MENUS.register(modBus);
-        ModRegistry.CREATIVE_TABS.register(modBus);
+        // TODO: Fix creative tab registration for 1.21.1
+        // ModRegistry.CREATIVE_TABS.register(modBus);
     }
 }

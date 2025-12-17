@@ -66,7 +66,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING, ATTACHED);
     }
 
@@ -96,13 +96,8 @@ public class BlackHoleBlock extends Block implements EntityBlock {
         return getShape(state, level, pos, ctx);
     }
 
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        // Don't open GUI if player is holding the chest block item (they want to place another chest)
-        ItemStack heldItem = player.getItemInHand(hand);
-        if (heldItem.getItem() == io.github.doritobob269.blackholeitemmovement.registry.ModRegistry.BLACK_HOLE_BLOCK_ITEM.get()) {
-            return InteractionResult.PASS;
-        }
-
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof BlackHoleBlockEntity) {
             BlackHoleBlockEntity bhbe = (BlackHoleBlockEntity) be;
@@ -116,18 +111,16 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                 }
                 return InteractionResult.SUCCESS;
             } else {
-                // Show toast with linked chest coordinates when clicking portal with empty hand
-                if (heldItem.isEmpty()) {
-                    if (!level.isClientSide) {
-                        BlockPos target = bhbe.getTarget();
-                        if (target != null) {
-                            player.displayClientMessage(Component.literal("Linked to black hole chest at " + target.toShortString()), true);
-                        } else {
-                            player.displayClientMessage(Component.literal("Not linked to any chest"), true);
-                        }
+                // Show toast with linked chest coordinates when clicking portal (useWithoutItem = empty hand)
+                if (!level.isClientSide) {
+                    BlockPos target = bhbe.getTarget();
+                    if (target != null) {
+                        player.displayClientMessage(Component.literal("Linked to black hole chest at " + target.toShortString()), true);
+                    } else {
+                        player.displayClientMessage(Component.literal("Not linked to any chest"), true);
                     }
-                    return InteractionResult.SUCCESS;
                 }
+                return InteractionResult.SUCCESS;
             }
         }
         return InteractionResult.PASS;

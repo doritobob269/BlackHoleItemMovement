@@ -16,6 +16,11 @@ public class BlackHoleChestMenu extends AbstractContainerMenu {
     private final BlackHoleBlockEntity blockEntity;
     private final net.minecraftforge.items.ItemStackHandler chestInventory;
 
+    // Client-side constructor
+    public BlackHoleChestMenu(int windowId, Inventory playerInv) {
+        this(windowId, playerInv, null);
+    }
+
     public BlackHoleChestMenu(int windowId, Inventory playerInv, BlockEntity be) {
         super(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), windowId);
         this.blockEntity = (BlackHoleBlockEntity) be;

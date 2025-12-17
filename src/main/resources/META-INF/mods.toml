@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion=">=47"
+loaderVersion=">=52"
 license="MIT"
 
 [[mods]]
@@ -11,17 +11,18 @@ A simple black hole mod: place receiver blocks at home and bind portable black h
 to that receiver. Place bound black holes on chests to suck items into the receiver.
 '''
 authors="Doritobob"
+displayURL="https://github.com/doritobob269"
 
 [[dependencies.blackholeitemmovement]]
     modId="forge"
     mandatory=true
-    versionRange="[47,)"
+    versionRange="[52,)"
     ordering="NONE"
     side="BOTH"
 
 [[dependencies.blackholeitemmovement]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.20.1]"
+    versionRange="[1.21.1]"
     ordering="NONE"
     side="BOTH"

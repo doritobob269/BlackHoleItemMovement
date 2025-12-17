@@ -1,5 +1,6 @@
 package io.github.doritobob269.blackholeitemmovement.item;
 
+import io.github.doritobob269.blackholeitemmovement.block.BlackHoleBlock;
 import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
 import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
 import net.minecraft.ChatFormatting;
@@ -45,7 +46,7 @@ public class BlackHoleItem extends Item {
 
         BlockPos clicked = ctx.getClickedPos();
         BlockState clickedState = level.getBlockState(clicked);
-        if (!level.isClientSide && clickedState.is(ModRegistry.BLACK_HOLE_BLOCK.get()) && !clickedState.getValue(BlockStateProperties.ATTACHED)) {
+        if (!level.isClientSide && clickedState.is(ModRegistry.BLACK_HOLE_BLOCK.get()) && !clickedState.getValue(BlackHoleBlock.ATTACHED)) {
             ItemStack stack = ctx.getItemInHand();
             var tag = new net.minecraft.nbt.CompoundTag();
             tag.putLong("TargetPos", clicked.asLong());
@@ -90,7 +91,7 @@ public class BlackHoleItem extends Item {
         // Place the black hole portal on the side of the container when crouching
         BlockPos placePos = ctx.getClickedPos().relative(ctx.getClickedFace());
         if (!level.isClientSide) {
-            BlockState state = ModRegistry.BLACK_HOLE_BLOCK.get().defaultBlockState().setValue(BlockStateProperties.FACING, ctx.getClickedFace()).setValue(BlockStateProperties.ATTACHED, true);
+            BlockState state = ModRegistry.BLACK_HOLE_BLOCK.get().defaultBlockState().setValue(BlackHoleBlock.FACING, ctx.getClickedFace()).setValue(BlackHoleBlock.ATTACHED, true);
             level.setBlock(placePos, state, 3);
             level.playSound(null, placePos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0f, 1.0f);
 
