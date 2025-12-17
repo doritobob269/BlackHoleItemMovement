@@ -4,6 +4,7 @@ import io.github.doritobob269.blackholeitemmovement.BlackHoleMod;
 import io.github.doritobob269.blackholeitemmovement.block.BlackHoleBlock;
 import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
 import io.github.doritobob269.blackholeitemmovement.item.BlackHoleItem;
+import io.github.doritobob269.blackholeitemmovement.item.BlackHoleWandItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -33,6 +34,8 @@ public class ModRegistry {
 
     public static final DeferredItem<BlackHoleItem> BLACK_HOLE_ITEM = ITEMS.register("black_hole_item", () -> new BlackHoleItem(new Item.Properties()));
 
+    public static final DeferredItem<BlackHoleWandItem> BLACK_HOLE_WAND = ITEMS.register("black_hole_wand", () -> new BlackHoleWandItem(new Item.Properties()));
+
     public static final DeferredItem<BlockItem> BLACK_HOLE_BLOCK_ITEM = ITEMS.register("black_hole_block", () -> new BlockItem(BLACK_HOLE_BLOCK.get(), new Item.Properties()) {
         @Override
         public void initializeClient(java.util.function.Consumer<net.neoforged.neoforge.client.extensions.common.IClientItemExtensions> consumer) {
@@ -57,6 +60,7 @@ public class ModRegistry {
         .icon(() -> BLACK_HOLE_ITEM.get().getDefaultInstance())
         .displayItems((parameters, output) -> {
             output.accept(BLACK_HOLE_ITEM.get());
+            output.accept(BLACK_HOLE_WAND.get());
             output.accept(BLACK_HOLE_BLOCK_ITEM.get());
         })
         .build());

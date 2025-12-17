@@ -1,0 +1,115 @@
+package io.github.doritobob269.blackholeitemmovement.item;
+
+import io.github.doritobob269.blackholeitemmovement.block.BlackHoleBlock;
+import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
+import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.List;
+
+public class BlackHoleWandItem extends Item {
+    public BlackHoleWandItem(Properties props) {
+        super(props.stacksTo(1)); // Wands don't stack
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
+        var customData = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY);
+        if (customData.contains("TargetPos")) {
+            long longPos = customData.copyTag().getLong("TargetPos");
+            BlockPos target = BlockPos.of(longPos);
+            tooltip.add(Component.literal("Linked to: " + target.toShortString()).withStyle(ChatFormatting.AQUA));
+        } else {
+            tooltip.add(Component.literal("Not bound to any chest").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.literal("Sneak + Right-click a black hole chest to bind").withStyle(ChatFormatting.GRAY));
+        }
+        tooltip.add(Component.literal("Reusable").withStyle(ChatFormatting.GOLD));
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext ctx) {
+        Level level = ctx.getLevel();
+        Player player = ctx.getPlayer();
+
+        BlockPos clicked = ctx.getClickedPos();
+        BlockState clickedState = level.getBlockState(clicked);
+
+        // Bind to a black hole chest
+        if (!level.isClientSide && clickedState.is(ModRegistry.BLACK_HOLE_BLOCK.get()) && !clickedState.getValue(BlackHoleBlock.ATTACHED)) {
+            ItemStack stack = ctx.getItemInHand();
+            var tag = new net.minecraft.nbt.CompoundTag();
+            tag.putLong("TargetPos", clicked.asLong());
+            stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(tag));
+            if (player != null) player.displayClientMessage(Component.literal("Bound to receiver at " + clicked.toShortString()), true);
+            return InteractionResult.SUCCESS;
+        }
+
+        // Check if the clicked block has an inventory
+        BlockEntity clickedBE = level.getBlockEntity(clicked);
+        if (clickedBE == null) {
+            return InteractionResult.FAIL;
+        }
+
+        boolean hasInventory = level.getCapability(Capabilities.ItemHandler.BLOCK, clicked, ctx.getClickedFace()) != null;
+        if (!hasInventory) {
+            hasInventory = level.getCapability(Capabilities.ItemHandler.BLOCK, clicked, null) != null;
+        }
+
+        if (!hasInventory) {
+            if (!level.isClientSide && player != null) {
+                player.displayClientMessage(Component.literal("This block has no inventory!"), true);
+            }
+            return InteractionResult.FAIL;
+        }
+
+        // If not crouching, allow the inventory to open normally
+        if (player != null && !player.isCrouching()) {
+            return InteractionResult.PASS;
+        }
+
+        // Check if the item is bound to a chest
+        ItemStack stack = ctx.getItemInHand();
+        var customData = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY);
+        if (!customData.contains("TargetPos")) {
+            if (!level.isClientSide && player != null) {
+                player.displayClientMessage(Component.literal("Black hole wand must be bound to a black hole chest first!").withStyle(ChatFormatting.RED), true);
+            }
+            return InteractionResult.FAIL;
+        }
+
+        // Place the black hole portal on the side of the container when crouching
+        BlockPos placePos = ctx.getClickedPos().relative(ctx.getClickedFace());
+        if (!level.isClientSide) {
+            BlockState state = ModRegistry.BLACK_HOLE_BLOCK.get().defaultBlockState()
+                .setValue(BlackHoleBlock.FACING, ctx.getClickedFace())
+                .setValue(BlackHoleBlock.ATTACHED, true);
+            level.setBlock(placePos, state, 3);
+            level.playSound(null, placePos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0f, 1.0f);
+
+            BlockEntity be = level.getBlockEntity(placePos);
+            if (be instanceof BlackHoleBlockEntity) {
+                long longPos = customData.copyTag().getLong("TargetPos");
+                BlockPos target = BlockPos.of(longPos);
+                ((BlackHoleBlockEntity) be).setTarget(target);
+            }
+
+            // Wand is not consumed - no shrink() call
+        }
+        return InteractionResult.CONSUME;
+    }
+}
