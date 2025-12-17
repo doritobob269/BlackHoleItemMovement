@@ -46,6 +46,30 @@ public class BlackHoleBlockEntity extends BlockEntity {
         return inventory;
     }
 
+    private LazyOptional<IItemHandler> inventoryCapability = LazyOptional.of(() -> inventory);
+
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        inventoryCapability.invalidate();
+    }
+
+    @Override
+    public void reviveCaps() {
+        super.reviveCaps();
+        inventoryCapability = LazyOptional.of(() -> inventory);
+    }
+
+    @Nonnull
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        // Expose inventory on all sides for chest blocks (not portals)
+        if (!this.getBlockState().getValue(BlackHoleBlock.ATTACHED) && cap == ForgeCapabilities.ITEM_HANDLER) {
+            return inventoryCapability.cast();
+        }
+        return super.getCapability(cap, side);
+    }
+
     public void startOpen() {
         this.openCount++;
     }
