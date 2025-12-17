@@ -119,8 +119,8 @@ public class BlackHoleBlock extends Block implements EntityBlock {
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof BlackHoleBlockEntity) {
                 BlackHoleBlockEntity bhbe = (BlackHoleBlockEntity) be;
-                // Only open GUI if not attached to a container (portable black holes have ATTACHED=true and targetPos)
-                boolean isPortableBlackHole = state.getValue(ATTACHED) && bhbe.getTarget() != null;
+                // Only open GUI if not attached to a container (portable black holes have ATTACHED=true)
+                boolean isPortableBlackHole = state.getValue(ATTACHED);
                 if (!isPortableBlackHole) {
                     // This is a Black Hole Chest, open GUI
                     level.playSound(null, pos, SoundEvents.CHEST_OPEN, SoundSource.BLOCKS, 0.5f, level.random.nextFloat() * 0.1f + 0.9f);
