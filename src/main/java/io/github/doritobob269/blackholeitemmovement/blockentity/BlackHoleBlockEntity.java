@@ -55,10 +55,25 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
 
     public void startOpen() {
         this.openCount++;
+        if (this.level != null) {
+            this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
+        }
     }
 
     public void stopOpen() {
         this.openCount--;
+        if (this.level != null) {
+            this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
+        }
+    }
+
+    @Override
+    public boolean triggerEvent(int id, int type) {
+        if (id == 1) {
+            this.openCount = type;
+            return true;
+        }
+        return super.triggerEvent(id, type);
     }
 
     public float getOpenNess(float partialTicks) {
