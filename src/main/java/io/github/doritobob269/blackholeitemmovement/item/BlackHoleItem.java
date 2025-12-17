@@ -51,8 +51,14 @@ public class BlackHoleItem extends Item {
             return InteractionResult.FAIL;
         }
 
+        // If not crouching, allow the inventory to open normally
+        if (player != null && !player.isCrouching()) {
+            return InteractionResult.PASS;
+        }
+
+        // Place the black hole portal on the side of the container when crouching
+        BlockPos placePos = ctx.getClickedPos().relative(ctx.getClickedFace());
         if (!level.isClientSide) {
-            BlockPos placePos = ctx.getClickedPos().relative(ctx.getClickedFace());
             BlockState state = ModRegistry.BLACK_HOLE_BLOCK.get().defaultBlockState().setValue(BlockStateProperties.FACING, ctx.getClickedFace()).setValue(BlockStateProperties.ATTACHED, true);
             level.setBlock(placePos, state, 3);
             level.playSound(null, placePos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0f, 1.0f);
@@ -72,6 +78,6 @@ public class BlackHoleItem extends Item {
                 ctx.getItemInHand().shrink(1);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.CONSUME;
     }
 }
