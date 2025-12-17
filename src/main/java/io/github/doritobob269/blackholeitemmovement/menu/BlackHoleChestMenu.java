@@ -2,6 +2,7 @@ package io.github.doritobob269.blackholeitemmovement.menu;
 
 import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
 import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
+import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Inventory;
@@ -15,15 +16,18 @@ import net.minecraftforge.items.SlotItemHandler;
 public class BlackHoleChestMenu extends AbstractContainerMenu {
     private final BlackHoleBlockEntity blockEntity;
     private final net.minecraftforge.items.ItemStackHandler chestInventory;
+    private final BlockPos pos;
 
-    // Client-side constructor
+    // Client/Server constructor for singleplayer
     public BlackHoleChestMenu(int windowId, Inventory playerInv) {
-        this(windowId, playerInv, null);
+        this(windowId, playerInv, BlockPos.ZERO, playerInv.player.level());
     }
 
-    public BlackHoleChestMenu(int windowId, Inventory playerInv, BlockEntity be) {
+    public BlackHoleChestMenu(int windowId, Inventory playerInv, BlockPos pos, net.minecraft.world.level.Level level) {
         super(ModRegistry.BLACK_HOLE_CHEST_MENU.get(), windowId);
-        this.blockEntity = (BlackHoleBlockEntity) be;
+        this.pos = pos;
+        BlockEntity be = level.getBlockEntity(pos);
+        this.blockEntity = be instanceof BlackHoleBlockEntity ? (BlackHoleBlockEntity) be : null;
 
         // Notify block entity that chest is being opened
         if (this.blockEntity != null) {

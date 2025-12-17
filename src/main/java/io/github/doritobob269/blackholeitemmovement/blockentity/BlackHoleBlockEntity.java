@@ -238,6 +238,6 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
 
     @Override
     public AbstractContainerMenu createMenu(int windowId, Inventory playerInventory, Player player) {
-        return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, playerInventory, this);
+        return new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, playerInventory, this.worldPosition, player.level());
     }
 }

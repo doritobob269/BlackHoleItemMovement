@@ -4,6 +4,7 @@ import io.github.doritobob269.blackholeitemmovement.BlackHoleMod;
 import io.github.doritobob269.blackholeitemmovement.block.BlackHoleBlock;
 import io.github.doritobob269.blackholeitemmovement.blockentity.BlackHoleBlockEntity;
 import io.github.doritobob269.blackholeitemmovement.item.BlackHoleItem;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -48,7 +49,7 @@ public class ModRegistry {
     });
 
     public static final RegistryObject<MenuType<io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu>> BLACK_HOLE_CHEST_MENU = MENUS.register("black_hole_chest", () ->
-        new MenuType<>(io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu::new, net.minecraft.world.flag.FeatureFlags.VANILLA_SET));
+        new MenuType<>((windowId, inv) -> new io.github.doritobob269.blackholeitemmovement.menu.BlackHoleChestMenu(windowId, inv), net.minecraft.world.flag.FeatureFlags.VANILLA_SET));
 
     // TODO: Fix creative tab registration for 1.21.1
     /*
