@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_black_hole": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["blackholeitemmovement:black_hole_item"]
+          }
+        ]
+      }
+    },
+    "has_chest": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["minecraft:chest"]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "blackholeitemmovement:black_hole_chest"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_black_hole",
+      "has_chest",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "blackholeitemmovement:black_hole_chest"
+    ]
+  }
+}

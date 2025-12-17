@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "tools",
+  "pattern": [
+    " B",
+    "S "
+  ],
+  "key": {
+    "B": {
+      "item": "blackholeitemmovement:black_hole_item"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "result": {
+    "id": "blackholeitemmovement:black_hole_wand",
+    "count": 1
+  }
+}
