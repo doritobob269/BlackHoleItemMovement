@@ -2,6 +2,8 @@
 
 A Minecraft NeoForge mod that adds black hole portals for instant item transportation and storage.
 
+Idea originally requested on the Minecraft Forums in 2015: [Here](https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/requests-ideas-for-mods/2381335-black-hole-mod-request)
+
 ## Features
 
 - **Black Hole Item**: Create linked portal pairs to instantly move items between locations
