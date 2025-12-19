@@ -12,6 +12,20 @@ See CurseForge page [Here](https://www.curseforge.com/minecraft/mc-mods/black-ho
 - **Black Hole Wand**: Reusable version of the black hole item for unlimited portal creation
 - **Black Hole Chest**: Portable chest with animated lid that can be placed anywhere
 
+## Use Cases
+
+### Dungeon Loot Collection
+Perfect for collecting loot from dungeons with many chests! Instead of manually looting dozens of chests:
+
+1. Place a **Black Hole Chest** at your base as a central collection point
+2. Bind your **Portable Black Holes** or **Black Hole Wand** to the chest
+3. Explore dungeons and place portals on each chest you find
+4. The black holes automatically extract all items from the chests and send them to your base
+5. Once a chest is empty, the portal collapses and disappears
+6. Use any item extraction method to pull items from your Black Hole Chest at home
+
+No need to open inventories or manually transfer items - just place the portal and continue exploring!
+
 ## Recipes
 
 - **Black Hole Item**: 8 Ender Pearls surrounding 1 Obsidian
