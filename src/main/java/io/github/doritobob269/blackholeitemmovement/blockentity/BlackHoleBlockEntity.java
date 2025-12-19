@@ -29,6 +29,8 @@ import javax.annotation.Nullable;
 public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
     @Nullable
     private BlockPos targetPos;
+    @Nullable
+    private net.minecraft.resources.ResourceKey<Level> targetDimension;
 
     // Chest inventory (27 slots)
     private final ItemStackHandler inventory = new ItemStackHandler(27) {
@@ -106,6 +108,12 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
         if (tag.contains("TargetPos")) {
             this.targetPos = BlockPos.of(tag.getLong("TargetPos"));
         }
+        if (tag.contains("TargetDimension")) {
+            this.targetDimension = net.minecraft.resources.ResourceKey.create(
+                net.minecraft.core.registries.Registries.DIMENSION,
+                net.minecraft.resources.ResourceLocation.parse(tag.getString("TargetDimension"))
+            );
+        }
         if (tag.contains("Inventory")) {
             inventory.deserializeNBT(provider, tag.getCompound("Inventory"));
         }
@@ -117,17 +125,26 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
         if (this.targetPos != null) {
             tag.putLong("TargetPos", this.targetPos.asLong());
         }
+        if (this.targetDimension != null) {
+            tag.putString("TargetDimension", this.targetDimension.location().toString());
+        }
         tag.put("Inventory", inventory.serializeNBT(provider));
     }
 
-    public void setTarget(BlockPos pos) {
+    public void setTarget(BlockPos pos, net.minecraft.resources.ResourceKey<Level> dimension) {
         this.targetPos = pos;
+        this.targetDimension = dimension;
         setChanged();
     }
 
     @Nullable
     public BlockPos getTarget() {
         return targetPos;
+    }
+
+    @Nullable
+    public net.minecraft.resources.ResourceKey<Level> getTargetDimension() {
+        return targetDimension;
     }
 
     private static ItemStack insertToHandler(IItemHandler dest, ItemStack stack) {
@@ -164,13 +181,25 @@ public class BlackHoleBlockEntity extends BlockEntity implements MenuProvider {
                 }
                 if (source == null) return;
 
-                // Get target chest's inventory
+                // Get target chest's inventory (cross-dimensional support)
                 BlockPos target = blackHole.getTarget();
+                net.minecraft.resources.ResourceKey<Level> targetDimension = blackHole.getTargetDimension();
                 IItemHandler targetInventory = null;
-                if (target != null) {
-                    BlockEntity targetBE = level.getBlockEntity(target);
-                    if (targetBE instanceof BlackHoleBlockEntity) {
-                        targetInventory = ((BlackHoleBlockEntity) targetBE).getInventory();
+
+                if (target != null && targetDimension != null) {
+                    // Get the target level (dimension)
+                    net.minecraft.server.MinecraftServer server = level.getServer();
+                    if (server != null) {
+                        net.minecraft.server.level.ServerLevel targetLevel = server.getLevel(targetDimension);
+                        if (targetLevel != null) {
+                            // Force load the chunk at the target position
+                            targetLevel.getChunkAt(target);
+
+                            BlockEntity targetBE = targetLevel.getBlockEntity(target);
+                            if (targetBE instanceof BlackHoleBlockEntity) {
+                                targetInventory = ((BlackHoleBlockEntity) targetBE).getInventory();
+                            }
+                        }
                     }
                 }
 

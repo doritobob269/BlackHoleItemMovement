@@ -25,6 +25,13 @@ public class BlackHoleChestItemRenderer extends BlockEntityWithoutLevelRenderer 
             chestBlockEntity = new BlackHoleBlockEntity(BlockPos.ZERO, ModRegistry.BLACK_HOLE_BLOCK.get().defaultBlockState());
         }
 
+        poseStack.pushPose();
+
+        // Rotate 180 degrees around Y axis to face the correct direction
+        poseStack.translate(0.5, 0, 0.5);
+        poseStack.mulPose(com.mojang.math.Axis.YP.rotationDegrees(180));
+        poseStack.translate(-0.5, 0, -0.5);
+
         // Get the renderer for our block entity
         BlockEntityRenderer<BlackHoleBlockEntity> renderer = Minecraft.getInstance()
             .getBlockEntityRenderDispatcher()
@@ -33,5 +40,7 @@ public class BlackHoleChestItemRenderer extends BlockEntityWithoutLevelRenderer 
         if (renderer != null) {
             renderer.render(chestBlockEntity, 0, poseStack, bufferSource, combinedLight, combinedOverlay);
         }
+
+        poseStack.popPose();
     }
 }

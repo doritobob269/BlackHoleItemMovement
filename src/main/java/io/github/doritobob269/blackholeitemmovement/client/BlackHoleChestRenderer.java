@@ -36,7 +36,7 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
 
         BlockState state = blockEntity.getBlockState();
 
-        // Only render for chest mode (not attached portable black holes)
+        // Only render animated lid for chest mode (not attached portable black holes)
         if (state.getValue(BlackHoleBlock.ATTACHED)) {
             return;
         }
@@ -65,10 +65,8 @@ public class BlackHoleChestRenderer implements BlockEntityRenderer<BlackHoleBloc
         // Get lid angle based on open time
         float lidAngle = blockEntity.getOpenNess(partialTicks);
 
-        // Render chest base
+        // Render chest base and lid
         renderChestBase(poseStack, bufferSource, combinedLight, combinedOverlay);
-
-        // Render chest lid with rotation
         renderChestLid(poseStack, bufferSource, combinedLight, combinedOverlay, lidAngle);
 
         poseStack.popPose();

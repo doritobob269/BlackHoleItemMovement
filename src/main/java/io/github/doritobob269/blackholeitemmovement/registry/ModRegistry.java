@@ -28,7 +28,7 @@ public class ModRegistry {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, BlackHoleMod.MODID);
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, BlackHoleMod.MODID);
 
-    public static final DeferredBlock<BlackHoleBlock> BLACK_HOLE_BLOCK = BLOCKS.register("black_hole", () -> new BlackHoleBlock(Block.Properties.of().noCollission().strength(3.0f).requiresCorrectToolForDrops()));
+    public static final DeferredBlock<BlackHoleBlock> BLACK_HOLE_BLOCK = BLOCKS.register("black_hole", () -> new BlackHoleBlock(Block.Properties.of().strength(3.0f).requiresCorrectToolForDrops()));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BlackHoleBlockEntity>> BLACK_HOLE_BLOCK_ENTITY = BLOCK_ENTITIES.register("black_hole", () -> BlockEntityType.Builder.of(BlackHoleBlockEntity::new, BLACK_HOLE_BLOCK.get()).build(null));
 

@@ -20,7 +20,6 @@ public class ClientSetup {
     public static void onClientSetup(FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
             BlockEntityRenderers.register(ModRegistry.BLACK_HOLE_BLOCK_ENTITY.get(), BlackHoleChestRenderer::new);
-            net.minecraft.client.renderer.ItemBlockRenderTypes.setRenderLayer(ModRegistry.BLACK_HOLE_BLOCK.get(), RenderType.translucent());
         });
     }
 

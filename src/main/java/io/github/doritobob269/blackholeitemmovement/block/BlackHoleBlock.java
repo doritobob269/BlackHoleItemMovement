@@ -103,9 +103,16 @@ public class BlackHoleBlock extends Block implements EntityBlock {
         };
     }
 
+    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext ctx) {
         // Use the same shape for collision as for visual bounds
         return getShape(state, level, pos, ctx);
+    }
+
+    @Override
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter level, BlockPos pos) {
+        // For chests, return the full shape so break overlay renders properly
+        return getShape(state, level, pos, CollisionContext.empty());
     }
 
     @Override
@@ -128,7 +135,15 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                 if (!level.isClientSide) {
                     BlockPos target = bhbe.getTarget();
                     if (target != null) {
-                        player.displayClientMessage(Component.literal("Linked to Black Hole Chest at " + target.toShortString()), true);
+                        net.minecraft.resources.ResourceKey<Level> targetDim = bhbe.getTargetDimension();
+                        String dimensionName = "Unknown";
+                        if (targetDim != null) {
+                            String dimStr = targetDim.location().toString();
+                            if (dimStr.contains(":")) {
+                                dimensionName = dimStr.substring(dimStr.lastIndexOf(':') + 1);
+                            }
+                        }
+                        player.displayClientMessage(Component.literal("Linked to Black Hole Chest at " + target.toShortString() + " (" + dimensionName + ")"), true);
                     } else {
                         player.displayClientMessage(Component.literal("Not linked to any chest"), true);
                     }
@@ -141,13 +156,22 @@ public class BlackHoleBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        // Use MODEL for chest blocks (not attached) so they can use BlockEntityRenderer
-        // Use ENTITYBLOCK_ANIMATED for chest animation
+        // Use ENTITYBLOCK_ANIMATED for chest blocks
         if (!state.getValue(ATTACHED)) {
             return RenderShape.ENTITYBLOCK_ANIMATED;
         }
-        // Use MODEL for portable black holes (they use static JSON models)
+        // Use MODEL for portable black holes
         return RenderShape.MODEL;
+    }
+
+    @Override
+    public float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
+        return 1.0f;
+    }
+
+    @Override
+    public boolean propagatesSkylightDown(BlockState state, BlockGetter level, BlockPos pos) {
+        return true;
     }
 
     @Nullable

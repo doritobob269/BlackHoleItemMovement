@@ -33,7 +33,16 @@ public class BlackHoleItem extends Item {
         if (customData.contains("TargetPos")) {
             long longPos = customData.copyTag().getLong("TargetPos");
             BlockPos target = BlockPos.of(longPos);
+            String dimensionName = "Unknown";
+            if (customData.contains("TargetDimension")) {
+                String dimStr = customData.copyTag().getString("TargetDimension");
+                // Extract just the dimension name (e.g., "overworld", "the_nether", "the_end")
+                if (dimStr.contains(":")) {
+                    dimensionName = dimStr.substring(dimStr.lastIndexOf(':') + 1);
+                }
+            }
             tooltip.add(Component.literal("Linked to: " + target.toShortString()).withStyle(ChatFormatting.AQUA));
+            tooltip.add(Component.literal("Dimension: " + dimensionName).withStyle(ChatFormatting.AQUA));
         } else {
             tooltip.add(Component.literal("Not bound to any chest").withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.literal("Sneak + Right-click a Black Hole Chest to bind").withStyle(ChatFormatting.GRAY));
@@ -51,6 +60,7 @@ public class BlackHoleItem extends Item {
             ItemStack stack = ctx.getItemInHand();
             var tag = new net.minecraft.nbt.CompoundTag();
             tag.putLong("TargetPos", clicked.asLong());
+            tag.putString("TargetDimension", level.dimension().location().toString());
             stack.set(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.of(tag));
             if (player != null) player.displayClientMessage(Component.literal("Bound to receiver at " + clicked.toShortString()), true);
             return InteractionResult.SUCCESS;
@@ -100,7 +110,16 @@ public class BlackHoleItem extends Item {
             if (be instanceof BlackHoleBlockEntity) {
                 long longPos = customData.copyTag().getLong("TargetPos");
                 BlockPos target = BlockPos.of(longPos);
-                ((BlackHoleBlockEntity) be).setTarget(target);
+
+                net.minecraft.resources.ResourceKey<Level> targetDimension = null;
+                if (customData.copyTag().contains("TargetDimension")) {
+                    targetDimension = net.minecraft.resources.ResourceKey.create(
+                        net.minecraft.core.registries.Registries.DIMENSION,
+                        net.minecraft.resources.ResourceLocation.parse(customData.copyTag().getString("TargetDimension"))
+                    );
+                }
+
+                ((BlackHoleBlockEntity) be).setTarget(target, targetDimension);
             }
 
             if (player != null && !player.isCreative()) {
