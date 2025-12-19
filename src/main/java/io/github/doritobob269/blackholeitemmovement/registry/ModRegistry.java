@@ -34,7 +34,7 @@ public class ModRegistry {
 
     public static final DeferredItem<BlackHoleItem> BLACK_HOLE_ITEM = ITEMS.register("black_hole_item", () -> new BlackHoleItem(new Item.Properties()));
 
-    public static final DeferredItem<BlackHoleWandItem> BLACK_HOLE_WAND = ITEMS.register("black_hole_wand", () -> new BlackHoleWandItem(new Item.Properties()));
+    public static final DeferredItem<BlackHoleWandItem> BLACK_HOLE_WAND = ITEMS.register("black_hole_wand", () -> new BlackHoleWandItem(new Item.Properties().durability(1024)));
 
     public static final DeferredItem<BlockItem> BLACK_HOLE_BLOCK_ITEM = ITEMS.register("black_hole_block", () -> new BlockItem(BLACK_HOLE_BLOCK.get(), new Item.Properties()) {
         @Override

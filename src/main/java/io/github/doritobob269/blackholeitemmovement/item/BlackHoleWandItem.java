@@ -108,7 +108,11 @@ public class BlackHoleWandItem extends Item {
                 ((BlackHoleBlockEntity) be).setTarget(target);
             }
 
-            // Wand is not consumed - no shrink() call
+            // Damage the wand by 1
+            if (player != null) {
+                stack.hurtAndBreak(1, player, ctx.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND ?
+                    net.minecraft.world.entity.EquipmentSlot.MAINHAND : net.minecraft.world.entity.EquipmentSlot.OFFHAND);
+            }
         }
         return InteractionResult.CONSUME;
     }
