@@ -128,7 +128,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                 if (!level.isClientSide) {
                     BlockPos target = bhbe.getTarget();
                     if (target != null) {
-                        player.displayClientMessage(Component.literal("Linked to black hole chest at " + target.toShortString()), true);
+                        player.displayClientMessage(Component.literal("Linked to Black Hole Chest at " + target.toShortString()), true);
                     } else {
                         player.displayClientMessage(Component.literal("Not linked to any chest"), true);
                     }

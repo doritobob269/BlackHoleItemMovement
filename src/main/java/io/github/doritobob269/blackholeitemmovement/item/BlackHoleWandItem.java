@@ -36,7 +36,7 @@ public class BlackHoleWandItem extends Item {
             tooltip.add(Component.literal("Linked to: " + target.toShortString()).withStyle(ChatFormatting.AQUA));
         } else {
             tooltip.add(Component.literal("Not bound to any chest").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.literal("Sneak + Right-click a black hole chest to bind").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.literal("Sneak + Right-click a Black Hole Chest to bind").withStyle(ChatFormatting.GRAY));
         }
         tooltip.add(Component.literal("Reusable").withStyle(ChatFormatting.GOLD));
     }
@@ -49,7 +49,7 @@ public class BlackHoleWandItem extends Item {
         BlockPos clicked = ctx.getClickedPos();
         BlockState clickedState = level.getBlockState(clicked);
 
-        // Bind to a black hole chest
+        // Bind to a Black Hole Chest
         if (!level.isClientSide && clickedState.is(ModRegistry.BLACK_HOLE_BLOCK.get()) && !clickedState.getValue(BlackHoleBlock.ATTACHED)) {
             ItemStack stack = ctx.getItemInHand();
             var tag = new net.minecraft.nbt.CompoundTag();
@@ -87,7 +87,7 @@ public class BlackHoleWandItem extends Item {
         var customData = stack.getOrDefault(net.minecraft.core.component.DataComponents.CUSTOM_DATA, net.minecraft.world.item.component.CustomData.EMPTY);
         if (!customData.contains("TargetPos")) {
             if (!level.isClientSide && player != null) {
-                player.displayClientMessage(Component.literal("Black hole wand must be bound to a black hole chest first!").withStyle(ChatFormatting.RED), true);
+                player.displayClientMessage(Component.literal("Black Hole Wand must be bound to a Black Hole Chest first!").withStyle(ChatFormatting.RED), true);
             }
             return InteractionResult.FAIL;
         }

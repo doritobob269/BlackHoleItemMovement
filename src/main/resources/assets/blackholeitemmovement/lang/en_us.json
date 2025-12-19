@@ -1,6 +1,6 @@
 {
-  "block.blackholeitemmovement.black_hole": "Black Hole",
+  "block.blackholeitemmovement.black_hole": "Black Hole Chest",
   "item.blackholeitemmovement.black_hole_item": "Portable Black Hole",
-  "item.blackholeitemmovement.black_hole_block": "Placed Black Hole",
-  "itemGroup.misc": "Miscellaneous"
+  "item.blackholeitemmovement.black_hole_wand": "Black Hole Wand",
+  "item.blackholeitemmovement.black_hole_block": "Placed Black Hole"
 }
