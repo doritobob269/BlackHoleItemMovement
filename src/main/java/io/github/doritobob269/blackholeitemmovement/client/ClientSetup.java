@@ -1,14 +1,11 @@
 package io.github.doritobob269.blackholeitemmovement.client;
 
 import io.github.doritobob269.blackholeitemmovement.registry.ModRegistry;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 @EventBusSubscriber(modid = "blackholeitemmovement", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
