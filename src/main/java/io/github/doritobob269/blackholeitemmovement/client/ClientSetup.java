@@ -11,7 +11,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 @EventBusSubscriber(modid = "blackholeitemmovement", bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientSetup {
 
-    private static final BlackHoleChestItemRenderer CHEST_ITEM_RENDERER = new BlackHoleChestItemRenderer();
+    private static BlackHoleChestItemRenderer CHEST_ITEM_RENDERER;
 
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event) {
@@ -26,6 +26,9 @@ public class ClientSetup {
     }
 
     public static BlackHoleChestItemRenderer getChestItemRenderer() {
+        if (CHEST_ITEM_RENDERER == null) {
+            CHEST_ITEM_RENDERER = new BlackHoleChestItemRenderer();
+        }
         return CHEST_ITEM_RENDERER;
     }
 }
