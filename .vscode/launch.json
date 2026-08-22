@@ -12,13 +12,13 @@
       "projectName": "BlackHoleMinecraftMod",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\clientRunProgramArgs.txt"
+        "@${workspaceFolder}/build/moddev/clientRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\clientRunVmArgs.txt",
-        "-Dfml.modFolders\u003dblackholeitemmovement%%C:\\dev\\projects\\BlackHoleMinecraftMod\\bin\\main"
+        "@${workspaceFolder}/build/moddev/clientRunVmArgs.txt",
+        "-Dfml.modFolders=blackholeitemmovement%%${workspaceFolder}/bin/main"
       ],
-      "cwd": "${workspaceFolder}\\run",
+      "cwd": "${workspaceFolder}/run",
       "env": {},
       "console": "internalConsole",
       "shortenCommandLine": "none"
@@ -34,13 +34,13 @@
       "projectName": "BlackHoleMinecraftMod",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\dataRunProgramArgs.txt"
+        "@${workspaceFolder}/build/moddev/dataRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\dataRunVmArgs.txt",
-        "-Dfml.modFolders\u003dblackholeitemmovement%%C:\\dev\\projects\\BlackHoleMinecraftMod\\bin\\main"
+        "@${workspaceFolder}/build/moddev/dataRunVmArgs.txt",
+        "-Dfml.modFolders=blackholeitemmovement%%${workspaceFolder}/bin/main"
       ],
-      "cwd": "${workspaceFolder}\\run",
+      "cwd": "${workspaceFolder}/run",
       "env": {},
       "console": "internalConsole",
       "shortenCommandLine": "none"
@@ -56,13 +56,13 @@
       "projectName": "BlackHoleMinecraftMod",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\gameTestServerRunProgramArgs.txt"
+        "@${workspaceFolder}/build/moddev/gameTestServerRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\gameTestServerRunVmArgs.txt",
-        "-Dfml.modFolders\u003dblackholeitemmovement%%C:\\dev\\projects\\BlackHoleMinecraftMod\\bin\\main"
+        "@${workspaceFolder}/build/moddev/gameTestServerRunVmArgs.txt",
+        "-Dfml.modFolders=blackholeitemmovement%%${workspaceFolder}/bin/main"
       ],
-      "cwd": "${workspaceFolder}\\run",
+      "cwd": "${workspaceFolder}/run",
       "env": {},
       "console": "internalConsole",
       "shortenCommandLine": "none"
@@ -78,13 +78,13 @@
       "projectName": "BlackHoleMinecraftMod",
       "mainClass": "net.neoforged.devlaunch.Main",
       "args": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\serverRunProgramArgs.txt"
+        "@${workspaceFolder}/build/moddev/serverRunProgramArgs.txt"
       ],
       "vmArgs": [
-        "@C:\\dev\\projects\\BlackHoleMinecraftMod\\build\\moddev\\serverRunVmArgs.txt",
-        "-Dfml.modFolders\u003dblackholeitemmovement%%C:\\dev\\projects\\BlackHoleMinecraftMod\\bin\\main"
+        "@${workspaceFolder}/build/moddev/serverRunVmArgs.txt",
+        "-Dfml.modFolders=blackholeitemmovement%%${workspaceFolder}/bin/main"
       ],
-      "cwd": "${workspaceFolder}\\run",
+      "cwd": "${workspaceFolder}/run",
       "env": {},
       "console": "internalConsole",
       "shortenCommandLine": "none"

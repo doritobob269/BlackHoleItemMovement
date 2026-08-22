@@ -1,16 +1,14 @@
 {
-  "name": "BlackHoleMinecraftMod",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "dbaeumer.vscode-eslint",
-        "mhutchie.git-graph",
-        "redhat.java",
-        "vscjava.vscode-gradle",
-        "vscjava.vscode-java-debug",
-        "vscjava.vscode-java-dependency",
-        "vscjava.vscode-maven"
-      ]
+    "name": "BlackHoleMinecraftMod",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "mhutchie.git-graph",
+                "redhat.java",
+                "vscjava.vscode-gradle",
+                "vscjava.vscode-java-debug",
+                "vscjava.vscode-java-dependency"
+            ]
+        }
     }
-  }
 }
