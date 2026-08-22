@@ -7,5 +7,8 @@
     "java.configuration.updateBuildConfiguration": "automatic",
     "java.compile.nullAnalysis.mode": "automatic",
     "java.inlayHints.parameterNames.enabled": "all",
-    "gradle.wrapper.enabled": true
+    "gradle.wrapper.enabled": true,
+    "java.jdt.ls.java.home": "/usr/lib/jvm/msopenjdk-current",
+    "java.import.gradle.java.home": "/usr/lib/jvm/msopenjdk-current",
+    "gradle.javaHome": "/usr/lib/jvm/msopenjdk-current"
 }
